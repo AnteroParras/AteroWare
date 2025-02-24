@@ -1,9 +1,9 @@
 import pygame
 import random
-
+import globals_config as gc
 from layout import draw_frame, show_text, fill_screen
 
-from globals_config import MINIGAME_TIME
+
 from globals_config import clock
 
 
@@ -27,7 +27,7 @@ def microgame_press_space():
                 return True  # Gana el minijuego
 
         # Verifica si se acabó el tiempo
-        if (pygame.time.get_ticks() - start_time) / 1000 > MINIGAME_TIME:
+        if (pygame.time.get_ticks() - start_time) / 1000 > gc.MINIGAME_TIME:
             return False  # Pierde el minijuego
 
         clock.tick(30)
@@ -36,8 +36,9 @@ def microgame_press_space():
 def microgame_press_space_in_time():
     """ Microjuego: Presionar espacio en un tiempo concreto """
     start_time = pygame.time.get_ticks()
-    start = random.randrange(1000, 2500)
-    interval = random.randrange(400, 1000)
+    start = random.randrange((int(gc.MINIGAME_TIME * 200)), int((gc.MINIGAME_TIME * 500)))
+    interval = random.randrange(int(gc.MINIGAME_TIME*180), int(gc.MINIGAME_TIME*200))
+
     failed = False
     win = False
 
@@ -47,34 +48,32 @@ def microgame_press_space_in_time():
 
         if win:
             show_text( "Que crack")
-            pygame.display.flip()
-        if failed:
+        elif failed:
             show_text("Cagaste")
-            pygame.display.flip()
-
-        if not failed and not win:
+        else:
             if pygame.time.get_ticks() - start_time < start:
-                show_text( "Espera...")
+                show_text("Espera...")
             elif start <= pygame.time.get_ticks() - start_time < start + interval:
-                show_text( "AHORA")
+                show_text("AHORA")
 
-            pygame.display.flip()
+        pygame.display.flip()
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
 
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    if start <= pygame.time.get_ticks() - start_time < start + interval:
-                        win = True
-                    else:
-                        failed = True
-                if pygame.time.get_ticks() - start_time >= start_time + interval:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                if start <= pygame.time.get_ticks() - start_time < start + interval:
+                    win = True
+                else:
                     failed = True
 
+        if pygame.time.get_ticks() - start_time >= start + interval and not win:
+            failed = True
+
         # Verifica si se acabó el tiempo
-        if (pygame.time.get_ticks() - start_time) / 1000 > MINIGAME_TIME:
+        if (pygame.time.get_ticks() - start_time) / 1000 > gc.MINIGAME_TIME:
             return win
 
         clock.tick(30)
