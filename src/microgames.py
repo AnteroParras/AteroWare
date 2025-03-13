@@ -1,7 +1,9 @@
 import pygame
 import random
+
+from Sprites_loaders import *
 import globals_config as gc
-from layout import draw_frame, show_text, fill_screen
+from layout import draw_frame, show_text, fill_screen, WIDTH, HEIGHT, screen
 
 from globals_config import clock
 
@@ -30,7 +32,6 @@ def microgame_press_space():
             return False  # Pierde el minijuego
 
         clock.tick(30)
-
 
 def microgame_press_space_in_time():
     """ Microjuego: Presionar espacio en un tiempo concreto """
@@ -75,6 +76,79 @@ def microgame_press_space_in_time():
         if (pygame.time.get_ticks() - start_time) / 1000 > gc.MINIGAME_TIME:
             return win
 
+        clock.tick(30)
+
+def microgame_explotar_burbujas():
+    start_time = pygame.time.get_ticks()
+    desfase = 40
+    num_of_targets = 3
+    clicked_targets = set()
+
+    # Calcular tamaño de los rectángulos para llenar la pantalla
+    num_x = (WIDTH - desfase * 2) // 8  # Ancho de cada burbuja
+    num_y = (HEIGHT - desfase * 2) // 4  # Alto de cada burbuja
+    radius = min(num_x, num_y) // 2  # Radio del círculo de detección
+
+    # Definir posiciones de burbujas
+    targets = []
+    bubbles = pygame.sprite.Group()
+
+    for row in range(4):
+        for col in range(8):
+            x = col * num_x + desfase
+            y = row * num_y + desfase
+            targets.append((x + num_x // 2, y + num_y // 2))  # Centro del rectángulo
+
+    selected_targets = set(random.sample(range(len(targets)), num_of_targets))  # Índices de burbujas seleccionadas
+
+    # Crear los sprites
+    for i, (x, y) in enumerate(targets):
+        if i in selected_targets:
+            bubble = Sprite("../assets/microgames/explotar_burbujas/bad.png",num_x, num_y)
+        else:
+            bubble = Sprite("../assets/microgames/explotar_burbujas/good.png", num_x, num_y)
+
+        bubble.actualizar_posicion(x - num_x // 2, y - num_y // 2)  # Centrar la imagen
+        bubbles.add(bubble)
+
+    # Bucle principal
+    while True:
+        fill_screen("WHITE")
+
+        # Dibujar los sprites en la pantalla
+        bubbles.draw(screen)
+
+        draw_frame()
+        show_text("¡Haz a Hank feliz!", justificacion='TOP')
+        pygame.display.flip()
+
+        # Manejo de eventos
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False  # Salir del minijuego
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mx, my = event.pos  # Obtener coordenadas del clic
+                for i, (x, y) in enumerate(targets):
+                    if i in selected_targets and (mx - x) ** 2 + (my - y) ** 2 <= radius ** 2:
+                        clicked_targets.add(i)
+                        selected_targets.remove(i)
+
+                        # Cambiar la imagen de la burbuja explotada
+                        for bubble in bubbles:
+                            if bubble.rect.collidepoint(mx, my):
+                                bubble.image = pygame.image.load("../assets/microgames/explotar_burbujas/good.png")
+                                bubble.image = pygame.transform.scale(bubble.image, (num_x, num_y))
+
+                if len(selected_targets) == 0:  # Si se explotan todas las burbujas seleccionadas
+                    return True
+
+        # Verificar si se acabó el tiempo
+        if (pygame.time.get_ticks() - start_time) / 1000 > gc.MINIGAME_TIME:
+            return False  # Perder el minijuego
+
+        pygame.display.flip()
         clock.tick(30)
 
 #TODO implementar los restantes
