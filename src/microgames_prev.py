@@ -1,7 +1,6 @@
 import pygame
 import random
 
-from Sprites_loaders import *
 import globals_config as gc
 from layout import draw_frame, show_text, fill_screen, WIDTH, HEIGHT, screen
 
@@ -104,12 +103,14 @@ def microgame_explotar_burbujas():
     # Crear los sprites
     for i, (x, y) in enumerate(targets):
         if i in selected_targets:
-            bubble = Sprite("../assets/microgames/explotar_burbujas/bad.png",num_x, num_y)
+            print("")
+            #bubble = Sprite("../assets/microgames/explotar_burbujas/bad.png",num_x, num_y)
         else:
-            bubble = Sprite("../assets/microgames/explotar_burbujas/good.png", num_x, num_y)
+            print("")
+            #bubble = Sprite("../assets/microgames/explotar_burbujas/good.png", num_x, num_y)
 
-        bubble.actualizar_posicion(x - num_x // 2, y - num_y // 2)  # Centrar la imagen
-        bubbles.add(bubble)
+        #bubble.actualizar_posicion(x - num_x // 2, y - num_y // 2)  # Centrar la imagen
+        #bubbles.add(bubble)
 
     # Bucle principal
     while True:

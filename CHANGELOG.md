@@ -13,3 +13,32 @@
 
 - ### **Areglado**:
   - No se arregló nada pero para que veas el tipo de formato para el **CHANGELOG**
+
+
+## [0.0.7] : 03 - 20 - 2025
+### Rama alterada: Desarrollo
+- ### **Añadido**:
+  - #### Carpeta Core:
+    - **Gestor_sprites**: Para cargar y gestionar los Sprites
+    - **Gestor_escenas**: Para cargar y gestionar las escenas
+    - **Gestor_audio**: Para cargar y gestionar los audios
+    - **gestor_microgames**: Para cargar y gestionar los microgames
+  
+  - #### Carpeta microjuegos:
+    - microgame_base: Clase base para los microgames
+    - microgame_hankujas: Microjuego de hank ya implementado ( Falta musica )
+
+- ### **Cambiado**:
+  - Reorganización de carpetas: Toda la reorganización esta en **docs/Estructura_proyecto**
+  - Se han añadido nuevas en **docs/TAREAS**
+  - Se ha modificado AteroWare para implementar los nuevos gestores
+  - El antiguo archivo microgames se ha llamado microgames_prev, quedando obsoleto
+
+- ### **Areglado**:
+  - El control de tiempos sobre los minijuegos
+
+> [!IMPORTANT]
+> Se prevee que la version [0.1] sea la primera versión jugable implementado todos los gestores, usando la rama release
+
+> [!WARING]
+> No se puede eliminar aun microgames_prev por varias dependencias
