@@ -1,10 +1,12 @@
 import pygame
-import random
+from core.gestor_audio import Audio
+from core.gestor_microgames import GameManager
+
 import globals_config as gc
 
-from layout import init, inner_time_safe_life, show_text, fill_screen
+from layout import init, inner_time_safe_life, show_text, fill_screen, screen
 
-from microgames import all_microgames_list
+from microgames_prev import all_microgames_list
 
 """ Inicializacion de variables y pantalla"""
 pygame.init()
@@ -15,11 +17,16 @@ running = True
 games_played = 0
 
 """ Bucle principal del juego """
+control_audio = Audio()
+control_juegos = GameManager(screen=screen)
+
 while running and gc.LIVES > 0 and len(MINIGAMES) > 0:
+
+    control_audio.reproducir(archivo="A1.mp3")
     inner_time_safe_life(gc.INTERVAL_TIME)
-    minigame = random.choice(MINIGAMES)  # Selecciona minijuego aleatorio
-    MINIGAMES.remove(minigame)
-    result = minigame()  # Ejecuta el minijuego
+    control_audio.detener()
+
+    result = control_juegos.ejecutar_microjuego(7)  # Ejecuta el minijuego
 
     games_played += 1
 
