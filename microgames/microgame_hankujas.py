@@ -6,18 +6,20 @@ from core.gestor_sprites import Sprite
 
 
 class MicrojuegoExplotarBurbujas(MicrojuegoBase):
-    def __init__(self, screen, time):
-        super().__init__(screen, time)
+    def __init__(self, screen, time, dificultad=1):
+        super().__init__(screen, time, dificultad=dificultad)
         #self.musica = "A1.mp3"  # Música del minijuego
         self.desfase = 40
-        self.num_of_targets = 3
         self.clicked_targets = set()
-        self.num_x = (self.screen.get_width() - self.desfase * 2) // 8  # Ancho de burbujas
-        self.num_y = (self.screen.get_height() - self.desfase * 2) // 4  # Alto de burbujas
+        self.num_x = (self.screen.get_width() - self.desfase * 2) // 5  # Ancho de burbujas
+        self.num_y = (self.screen.get_height() - self.desfase * 2) // 7 # Alto de burbujas
         self.radius = min(self.num_x, self.num_y) // 2  # Radio de detección
         self.targets = []
         self.bubbles = pygame.sprite.Group()  # Grupo de sprites
         self.selected_targets = set()
+        self.num_of_targets = 3 + int((dificultad-1)*1.5)
+
+        self.win = False
 
         self.cargar_sprites()
 
@@ -48,24 +50,25 @@ class MicrojuegoExplotarBurbujas(MicrojuegoBase):
                 if i in self.selected_targets and (mx - x) ** 2 + (my - y) ** 2 <= self.radius ** 2:
                     self.clicked_targets.add(i)
                     self.selected_targets.remove(i)
-
                     # Cambiar la imagen de la burbuja explotada
                     for bubble in self.bubbles:
                         if bubble.rect.collidepoint(mx, my):
                             bubble.image = pygame.image.load("../assets/microgames/explotar_burbujas/good.png")
                             bubble.image = pygame.transform.scale(bubble.image, (self.num_x, self.num_y))
 
-            if len(self.selected_targets) == 0:  # Si explotaron todas las necesarias
-                return True  # Minijuego ganado
-
     def actualizar(self):
         """Actualizar estado del minijuego"""
-        pass
+        if len(self.selected_targets) == 0:  # Si explotaron todas las necesarias
+            self.win = True  # Minijuego ganado
 
     def dibujar(self):
         """Dibuja los sprites en pantalla"""
         self.screen.fill((255, 255, 255))  # Fondo blanco
         draw_frame()
         self.bubbles.draw(self.screen)
-        show_text("Haz feliz a Hank!!", justificacion="TOP")
+
+        if not self.win:
+            show_text("Haz feliz a Hank!!", justificacion="TOP")
+        else:
+            show_text("Ole que ole!!", justificacion="TOP")
         pygame.display.flip()

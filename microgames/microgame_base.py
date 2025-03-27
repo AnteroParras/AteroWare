@@ -4,11 +4,13 @@ from core.gestor_audio import Audio
 
 
 class MicrojuegoBase:
-    def __init__(self, screen, tiempo):
+    def __init__(self, screen, tiempo, dificultad=1):
         self.screen = screen
         self.sprites = []  # Lista de sprites del minijuego
         self.audio = Audio()
         self.tiempo_limite = tiempo  # Segundos para completar el minijuego
+        self.win = False
+        self.dificultad = dificultad
 
     def cargar_sprites(self):
         """Carga los sprites específicos del minijuego (sobreescrito en hijos)."""
@@ -51,6 +53,6 @@ class MicrojuegoBase:
 
             # Verifica si se acabó el tiempo
             if (pygame.time.get_ticks() - inicio) / 1000 > self.tiempo_limite:
-                return False  # Minijuego perdido
+                return self.win  # Minijuego perdido
 
             reloj.tick(30)

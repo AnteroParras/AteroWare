@@ -6,13 +6,10 @@ import globals_config as gc
 
 from layout import init, inner_time_safe_life, show_text, fill_screen, screen
 
-from microgames_prev import all_microgames_list
-
 """ Inicializacion de variables y pantalla"""
 pygame.init()
 init()
 
-MINIGAMES = all_microgames_list()
 running = True
 games_played = 0
 
@@ -20,23 +17,22 @@ games_played = 0
 control_audio = Audio()
 control_juegos = GameManager(screen=screen)
 
-while running and gc.LIVES > 0 and len(MINIGAMES) > 0:
+while running and gc.LIVES > 0 and not control_juegos.isTerminado():
 
     control_audio.reproducir(archivo="A1.mp3")
     inner_time_safe_life(gc.INTERVAL_TIME)
     control_audio.detener()
 
     result = control_juegos.ejecutar_microjuego(7)  # Ejecuta el minijuego
+    control_juegos.siguiente_vuelta()
 
     games_played += 1
 
     if not result:
         gc.LIVES -= 1  # Pierde una vida si falla
 
-    if gc.LIVES <= 0 or len(MINIGAMES) == 0:
-        running = False # Si no quedan minijuegos o vidas pierdes
-    gc.increase_dificult()
-
+    if gc.LIVES <= 0 or control_juegos.isTerminado():
+        running = False  # Si no quedan minijuegos o vidas pierdes
 
 if gc.LIVES > 0:
     fill_screen("WHITE")
