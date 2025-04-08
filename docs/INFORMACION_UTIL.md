@@ -17,10 +17,11 @@ Esta archivo tiene dos clases implementada ( y una tercera en cocción si lo ves
 - GIFloader: Sirve para cargar GIFS, hereda de Sprite
 - VideoLoader: Serviría para mostrar video
 
+### NOMBRE EN MICROJUEGOS
+Antes era totalmente necesario empezase por microgame por la funcion que se utilizaba para recopilarlos pero ya no hace falta, cualqueir nombre es aceptado
+
 ### IMPORTANTE
-En microgames.py existe la funcion:  
-~~~
-def all_microgames_list():
-    return [func for name, func in globals().items() if callable(func) and name.startswith("microgame")]
-~~~
-Esta funcion se encarga de devolver una lista con todas las funciones, pero para ello es **NECESARIO QUE LOS MINIJUEGOS EMPIECEN POR minigame**
+Reviste los cambios realizados en:
+- AteroWare, ahora adaptado a la nueva forma de cargar los microjuegos con gestor_microjuegos
+- GestorMicrojuegos, ahora usando la dificultad como parametro
+- Las nuevas funciones en gestor_microjuegos, funciones sencillas pero hay que usar

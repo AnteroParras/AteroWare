@@ -42,3 +42,17 @@
 
 > [!WARNING]
 > No se puede eliminar aun microgames_prev por varias dependencias
+
+
+## [0.0.8] :  08 - 04 - 2025
+- ### **Añadido**:
+  - Microjuego codigo: Microjuego de codigo ya implementado ( Falta musica )
+  - Microjuego snake: Microjuego de snake ya implementado ( Falta musica )
+  - Assets para snake
+  
+- ### **Cambiado**:
+  - Se ha eliminado microgame_prev, ya no es necesario para el codigo en Ateroware
+  - Se han modificado una serie de clases explicadas en detalle en Informacion_util
+
+- ### **Areglado**:
+  - Se ha solucionado el error a la hora de generar a los hanks

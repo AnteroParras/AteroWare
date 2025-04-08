@@ -20,7 +20,7 @@ control_juegos = GameManager(screen=screen)
 while running and gc.LIVES > 0 and not control_juegos.isTerminado():
 
     control_audio.reproducir(archivo="A1.mp3")
-    inner_time_safe_life(gc.INTERVAL_TIME)
+    inner_time_safe_life(2)
     control_audio.detener()
 
     result = control_juegos.ejecutar_microjuego(7)  # Ejecuta el minijuego

@@ -2,18 +2,18 @@ import pygame
 import globals_config as gc
 
 COLORS = {
-    "WHITE" : (255, 255, 255),
-    "RED" : (200, 0, 0),
-    "BLACK" : (0, 0, 0),
-    "EXTERNAL_FRAME_COLOR" : (208, 144, 248),
-    "GRADIENT_FRAME_COLOR" : (224, 187, 248)
+    "WHITE": (255, 255, 255),
+    "RED": (200, 0, 0),
+    "BLACK": (0, 0, 0),
+    "EXTERNAL_FRAME_COLOR": (208, 144, 248),
+    "GRADIENT_FRAME_COLOR": (224, 187, 248)
 }
 
 WIDTH, HEIGHT = 800, 600
-EXTERNAL_FRAME_THICKNESS = 30  # Grosor del marco
-GRADIENT_FRAME_THICKNESS = 10
+
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
 
 def init():
     """
@@ -22,10 +22,19 @@ def init():
     pygame.display.set_caption("AteroWare")
     font = pygame.font.Font(None, 36)
 
-def draw_frame():
+
+def draw_frame(correction_x=0, correction_y=0):
     """
     Dibuja el marco de los minijuegos
     """
+    EXTERNAL_FRAME_THICKNESS = 30  # Grosor del marco
+    GRADIENT_FRAME_THICKNESS = 10
+
+    if correction_x != 0:
+        EXTERNAL_FRAME_THICKNESS += correction_x/2
+
+    if correction_y != 0:
+        EXTERNAL_FRAME_THICKNESS += correction_y/2
 
     pygame.draw.rect(screen, COLORS["EXTERNAL_FRAME_COLOR"], (0, 0, WIDTH, EXTERNAL_FRAME_THICKNESS))
     pygame.draw.rect(screen, COLORS["GRADIENT_FRAME_COLOR"],
@@ -33,25 +42,27 @@ def draw_frame():
 
     pygame.draw.rect(screen, COLORS["EXTERNAL_FRAME_COLOR"], (0, 0, EXTERNAL_FRAME_THICKNESS, WIDTH))
     pygame.draw.rect(screen, COLORS["GRADIENT_FRAME_COLOR"], (EXTERNAL_FRAME_THICKNESS, EXTERNAL_FRAME_THICKNESS,
-                                                    GRADIENT_FRAME_THICKNESS,
-                                                    HEIGHT))
+                                                              GRADIENT_FRAME_THICKNESS,
+                                                              HEIGHT))
 
     pygame.draw.rect(screen, COLORS["EXTERNAL_FRAME_COLOR"], (0, HEIGHT - EXTERNAL_FRAME_THICKNESS,
-                                                    WIDTH, EXTERNAL_FRAME_THICKNESS))
+                                                              WIDTH, EXTERNAL_FRAME_THICKNESS))
     pygame.draw.rect(screen, COLORS["GRADIENT_FRAME_COLOR"], (EXTERNAL_FRAME_THICKNESS,
-                                                    HEIGHT - EXTERNAL_FRAME_THICKNESS - GRADIENT_FRAME_THICKNESS,
-                                                    WIDTH, GRADIENT_FRAME_THICKNESS))
+                                                              HEIGHT - EXTERNAL_FRAME_THICKNESS - GRADIENT_FRAME_THICKNESS,
+                                                              WIDTH, GRADIENT_FRAME_THICKNESS))
 
     pygame.draw.rect(screen, COLORS["EXTERNAL_FRAME_COLOR"], (WIDTH - EXTERNAL_FRAME_THICKNESS, 0,
-                                                    WIDTH, HEIGHT))
-    pygame.draw.rect(screen, COLORS["GRADIENT_FRAME_COLOR"], (WIDTH - GRADIENT_FRAME_THICKNESS - EXTERNAL_FRAME_THICKNESS,
-                                                    GRADIENT_FRAME_THICKNESS + EXTERNAL_FRAME_THICKNESS,
-                                                    GRADIENT_FRAME_THICKNESS,
-                                                    HEIGHT - 2 * GRADIENT_FRAME_THICKNESS - 2 * EXTERNAL_FRAME_THICKNESS))
+                                                              WIDTH, HEIGHT))
+    pygame.draw.rect(screen, COLORS["GRADIENT_FRAME_COLOR"],
+                     (WIDTH - GRADIENT_FRAME_THICKNESS - EXTERNAL_FRAME_THICKNESS,
+                      GRADIENT_FRAME_THICKNESS + EXTERNAL_FRAME_THICKNESS,
+                      GRADIENT_FRAME_THICKNESS,
+                      HEIGHT - 2 * GRADIENT_FRAME_THICKNESS - 2 * EXTERNAL_FRAME_THICKNESS))
 
 
 def fill_screen(color):
     screen.fill(COLORS[color])
+
 
 #TODO implementar menu de pausa junto a la funcion de cerrar el juego
 #     la estructura de implementacion en los minijuegos es la siguiente:
@@ -63,8 +74,11 @@ def fill_screen(color):
            
     Se debe incluir dentro de cada bucle
 '''
+
+
 def pause_menu():
-    return None #Rellenar
+    return None  #Rellenar
+
 
 def show_text(texto, size=36, justificacion='MIDDLE', color=(0, 0, 0), edge=False):
     """
@@ -130,5 +144,5 @@ def inner_time_safe_life(time):
 
         time = int(limit - (pygame.time.get_ticks() - start_time) / 1000)
 
-        if (pygame.time.get_ticks() - start_time) / 1000 > limit-1:
+        if (pygame.time.get_ticks() - start_time) / 1000 > limit - 1:
             return

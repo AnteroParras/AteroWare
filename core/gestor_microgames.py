@@ -1,10 +1,13 @@
 from microgames.microgame_hankujas import MicrojuegoExplotarBurbujas
-from microgames.microgame_gtaHack import MicrojuegoHackearGTA
+from microgames.microgame_codigo import MicrojuegoEscribirCodigo
+from microgames.microgame_diana import MicrojuegoDispararFlecha
+from microgames.microgame_snake import SnakeGame
+
 
 class GameManager:
     def __init__(self, screen):
         self.screen = screen
-        self.minijuegos = [MicrojuegoHackearGTA]  # Lista de clases de minijuegos
+        self.minijuegos = [SnakeGame]  # Lista de clases de minijuegos
         self.indice = 0  # Lleva el progreso
         self.dificultad = 1
 
