@@ -3,7 +3,7 @@ import random
 from src.layout import draw_frame, show_text
 from microgames.microgame_base import MicrojuegoBase
 from core.gestor_sprites import Sprite
-
+from core.gestor_audio import Audio
 
 class SnakeGame(MicrojuegoBase):
     def __init__(self, screen, tiempo, dificultad=1, infinity=False):
@@ -11,6 +11,8 @@ class SnakeGame(MicrojuegoBase):
 
         # Margen fijo
         self.margen = 40
+        self.audio = Audio()
+
 
         # Zona jugable y tamaño de celda
         self.ancho = screen.get_width() - 2 * self.margen
@@ -78,6 +80,7 @@ class SnakeGame(MicrojuegoBase):
                                   self.tamano_celda_alto)
 
         self.remaining_food = 321 if infinity else (2 + self.dificultad)
+        self.derrota = False
 
     def generar_comida(self):
         num_celdas_x = self.ancho // self.tamano_celda_ancho
@@ -117,7 +120,6 @@ class SnakeGame(MicrojuegoBase):
                 x >= self.screen.get_width() - self.margen or
                 y >= self.screen.get_height() - self.margen):
             self.win = False
-            self.mostrar_derrota()
 
         self.snake.insert(0, nueva_cabeza)
 
@@ -222,6 +224,8 @@ class SnakeGame(MicrojuegoBase):
         pygame.display.flip()
 
     def mostrar_victoria(self):
+        self.audio.detener()
+        self.audio.reproducir("Fnaf.mp3")
         self.remaining_food -= 1
 
         overlay = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
@@ -238,27 +242,34 @@ class SnakeGame(MicrojuegoBase):
         pygame.display.flip()
 
     def ejecutar(self):
+        self.audio.reproducir("A1.mp3")
+
         reloj = pygame.time.Clock()
         inicio = pygame.time.get_ticks()
 
         while True:
+            if self.win:
+                if self.remaining_food > 0:
+                    print(self.win)
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            return False
+                        self.manejar_eventos(event)
 
-            if self.remaining_food > 0:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        return False
-                    self.manejar_eventos(event)
+                    self.actualizar()
+                    self.dibujar()
 
-                self.actualizar()
-                self.dibujar()
-
-            elif self.remaining_food == 0:
-                self.mostrar_victoria()
+                elif self.remaining_food == 0:
+                    self.mostrar_victoria()
+            elif not self.derrota:
+                self.derrota = True
+                self.mostrar_derrota()
 
             pygame.display.flip()
 
             if (pygame.time.get_ticks() - inicio) / 1000 > self.tiempo_limite:
+                self.audio.detener()
                 return self.win and self.remaining_food == -1
 
             reloj.tick(10)

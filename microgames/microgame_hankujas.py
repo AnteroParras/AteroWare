@@ -20,6 +20,7 @@ class MicrojuegoExplotarBurbujas(MicrojuegoBase):
         self.num_of_targets = 3 + int((dificultad-1)*1.5)
 
         self.win = False
+        self.musica = "A1.mp3"
 
         self.cargar_sprites()
 

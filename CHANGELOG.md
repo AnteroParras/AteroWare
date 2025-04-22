@@ -56,3 +56,17 @@
 
 - ### **Areglado**:
   - Se ha solucionado el error a la hora de generar a los hanks
+
+
+
+## [0.1] :  22 - 04 - 2025
+- ### **Añadido**:
+  - Macrojuego: Pong4D
+  - Gestion de macrojuegos, ademas de pantalla, inicio y ventanas dedicadas al macrojuego
+  - 
+  
+- ### **Cambiado**:
+  - Se han activado los audios de los archivos, ya no son playholders
+  
+- ### **Areglado**:
+  - Se ha arreglado incompatibilidades con la gestion de microjuegos y macrojuegos

@@ -24,7 +24,6 @@ while running and gc.LIVES > 0 and not control_juegos.isTerminado():
     control_audio.detener()
 
     result = control_juegos.ejecutar_microjuego(7)  # Ejecuta el minijuego
-    control_juegos.siguiente_vuelta()
 
     games_played += 1
 

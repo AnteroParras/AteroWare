@@ -11,6 +11,7 @@ class MicrojuegoBase:
         self.tiempo_limite = tiempo  # Segundos para completar el minijuego
         self.win = False
         self.dificultad = dificultad
+        self.musica = None # Música del minijuego
 
     def cargar_sprites(self):
         """Carga los sprites específicos del minijuego (sobreescrito en hijos)."""
@@ -35,7 +36,7 @@ class MicrojuegoBase:
 
     def ejecutar(self):
         """Ejecuta el bucle del minijuego y devuelve si ganó o perdió"""
-        #self.reproducir_musica()
+        self.audio.reproducir(self.musica)
         reloj = pygame.time.Clock()
         inicio = pygame.time.get_ticks()
 

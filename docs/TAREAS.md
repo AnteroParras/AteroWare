@@ -29,3 +29,10 @@ Estaria de lujisimo mejorar la funcion **show_text** en ***layout*** con las sig
 - Buscar una tipografica bonica para el juego
 - Tal vez añadir funciones como rebordes para que se vea mejor sobre los fondos
 - Comentar cada funcion en cada juego aunque sea un poco rebundante a veces
+
+
+## Nerd zone
+- ### **Cambios técnicos a realizar**
+    - Hay un problema con los fps dentro del Pong4D, mirar eso
+    - Pygame.mixer() no permite superponer audios, lo que significa que no podemos poner efectos de sonido, buscar si podemos hacer algo
+    - Comprobar los tamaños de pantalla a la hora de dibujar, fijarse que todas las divisiones son exactas

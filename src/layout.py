@@ -9,7 +9,7 @@ COLORS = {
     "GRADIENT_FRAME_COLOR": (224, 187, 248)
 }
 
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 800, 692
 
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
