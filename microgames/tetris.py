@@ -3,8 +3,6 @@ import random
 from src.layout import draw_frame
 from microgames.microgame_base import MicrojuegoBase
 
-
-
 # Super Rotation System (SRS) wall kick data
 JLSTZ_KICKS = {
     (0, 1): [(0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2)],
@@ -42,11 +40,15 @@ COLORES = {
     'S': (0, 255, 0), 'Z': (255, 0, 0), 'L': (255, 165, 0), 'J': (0, 0, 255)
 }
 
+# Original NES gravity speeds in frames (60fps) per level 0-10+\N
+GRAVITY_FRAMES = [48, 43, 38, 33, 28, 23, 18, 13, 8, 6] + [5] * 91
+
 class Tetris(MicrojuegoBase):
     def __init__(self, screen, tiempo, dificultad=1):
-        super().__init__(screen, 120, dificultad)
+        super().__init__(screen, 999, dificultad)
+        self.musica = "T1.mp3"
+
         self.ancho_bloque = 30
-        self.musica = "FinalBoss.mp3"
         self.columnas = 10
         self.filas = 20
         self.margen_x = (screen.get_width() - self.columnas * self.ancho_bloque) // 2
@@ -58,13 +60,20 @@ class Tetris(MicrojuegoBase):
         self.pos = [0, 3]
         self.rot = 0
         self.last = pygame.time.get_ticks()
-        self.delay = 500
+        # level and line counters
+        self.level = 0
+        self.lines = 0
+        # timing
+        self.delay = GRAVITY_FRAMES[self.level] * (1000/60)
         self.fast = False
         self.lock_delay = 500
         self.lock_time = None
+        # storage and score
         self.guarda = None
         self.can_store = True
         self.score = 0
+        # rotation flag
+        self.last_rotate = False
         self._fill_bag()
         self._next()
 
@@ -84,6 +93,7 @@ class Tetris(MicrojuegoBase):
         self.rot = 0
         self.can_store = True
         self.lock_time = None
+        self.last_rotate = False
 
     def _can_place(self, shape, off, rot):
         for i, row in enumerate(shape):
@@ -105,25 +115,20 @@ class Tetris(MicrojuegoBase):
                 self.pos[1] += dy
                 self.rot = new
                 self.lock_time = None
+                self.last_rotate = True
                 break
 
     def manejar_eventos(self, event):
-        # Movimiento continuo: izquierda, derecha y bajada rápida
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self._can_place(FORMAS[self.actual][self.rot], (0, -1), self.rot):
             self.pos[1] -= 1
             self.lock_time = None
+            self.last_rotate = False
         if keys[pygame.K_RIGHT] and self._can_place(FORMAS[self.actual][self.rot], (0, 1), self.rot):
             self.pos[1] += 1
             self.lock_time = None
+            self.last_rotate = False
         self.fast = keys[pygame.K_DOWN]
-
-        # Procesar eventos puntuales
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            exit()
-
-        # Rotaciones y almacenar
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 self._rotate(1)
@@ -131,8 +136,6 @@ class Tetris(MicrojuegoBase):
                 self._rotate(-1)
             elif event.key == pygame.K_LSHIFT and self.can_store:
                 self._store()
-
-            # Menú de pausa
             elif event.key == pygame.K_ESCAPE:
                 accion = self.menu.mostrar_pausa(self.screen)
                 if accion == "continue":
@@ -145,9 +148,6 @@ class Tetris(MicrojuegoBase):
                     # retornamos una señal para que el bucle superior maneje la salida
                     return "exit_to_menu"
 
-        # Si no devolvimos "exit_to_menu", devolvemos None para seguir jugando
-        return None
-
     def _store(self):
         self.actual, self.guarda = self.guarda, self.actual
         if not self.actual:
@@ -156,8 +156,11 @@ class Tetris(MicrojuegoBase):
             self.pos = [0, self.columnas // 2 - len(FORMAS[self.actual][0][0]) // 2]
             self.rot = 0
         self.can_store = False
+        self.last_rotate = False
 
     def actualizar(self):
+        # update level speed
+        self.delay = GRAVITY_FRAMES[min(self.level, len(GRAVITY_FRAMES)-1)] * (1000/60)
         now = pygame.time.get_ticks()
         spd = 50 if self.fast else self.delay
         if now - self.last > spd:
@@ -177,21 +180,29 @@ class Tetris(MicrojuegoBase):
                 self.lock_time = None
 
     def _lock(self):
+        # place piece
         for i, row in enumerate(FORMAS[self.actual][self.rot]):
             for j, val in enumerate(row):
                 if val:
                     self.grid[self.pos[0] + i][self.pos[1] + j] = self.actual
-        self._clear()
-        self._next()
-
-    def _clear(self):
+        # clear lines and count
         new = [r for r in self.grid if not all(r)]
         cnt = self.filas - len(new)
         for _ in range(cnt):
             new.insert(0, [0] * self.columnas)
         self.grid = new
-        self.score += 100 * cnt
+        # update lines and level
+        self.lines += cnt
+        if cnt > 0:
+            self.level = self.lines // 1
+            if self.level == 5:
+                self.audio.detener()
+                self.musica = "T2.mp3"
+                self.audio.reproducir(self.musica)
+        # scoring
+        self.score += 100 * cnt + (50 * cnt if cnt > 1 else 0)
         self.win = cnt > 0
+        self._next()
 
     def dibujar(self):
         super().dibujar()
@@ -202,8 +213,15 @@ class Tetris(MicrojuegoBase):
              self.columnas * self.ancho_bloque + 4,
              self.filas * self.ancho_bloque + 4), 2
         )
-        txt = pygame.font.SysFont(None, 24).render(f"Puntos:{self.score}", True, (255, 255, 255))
-        self.screen.blit(txt, (20, 280))
+        # display score, lines, level
+        font = pygame.font.SysFont(None, 24)
+        txt_score = font.render(f"Puntos: {self.score}", True, (255, 255, 255))
+        txt_lines = font.render(f"Lineas: {self.lines}", True, (255, 255, 255))
+        txt_level = font.render(f"Nivel: {self.level}", True, (255, 255, 255))
+        self.screen.blit(txt_score, (20, 280))
+        self.screen.blit(txt_lines, (20, 310))
+        self.screen.blit(txt_level, (20, 340))
+        # draw grid and pieces
         for i in range(self.filas):
             for j in range(self.columnas):
                 p = self.grid[i][j]
@@ -214,8 +232,8 @@ class Tetris(MicrojuegoBase):
                          self.margen_y + i * self.ancho_bloque,
                          self.ancho_bloque, self.ancho_bloque)
                     )
-        shape = FORMAS[self.actual][self.rot]
-        for i, row in enumerate(shape):
+        # current piece
+        for i, row in enumerate(FORMAS[self.actual][self.rot]):
             for j, val in enumerate(row):
                 if val:
                     pygame.draw.rect(
@@ -224,24 +242,26 @@ class Tetris(MicrojuegoBase):
                          self.margen_y + (self.pos[0] + i) * self.ancho_bloque,
                          self.ancho_bloque, self.ancho_bloque)
                     )
+        # stored piece
         if self.guarda:
-            txt = pygame.font.SysFont(None, 24).render("Guardado", True, (255, 255, 255))
-            self.screen.blit(txt, (20, 20))
+            tx = pygame.font.SysFont(None, 24).render("Guardado", True, (255, 255, 255))
+            self.screen.blit(tx, (20, 20))
             for i, row in enumerate(FORMAS[self.guarda][0]):
-                for j, val in enumerate(row):
-                    if val:
+                for j, v in enumerate(row):
+                    if v:
                         pygame.draw.rect(
                             self.screen, COLORES[self.guarda],
                             (20 + j * self.ancho_bloque,
                              40 + i * self.ancho_bloque,
                              self.ancho_bloque, self.ancho_bloque)
                         )
+        # next piece
         if self.siguiente:
-            txt = pygame.font.SysFont(None, 24).render("Siguiente", True, (255, 255, 255))
-            self.screen.blit(txt, (20, 150))
+            tx = pygame.font.SysFont(None, 24).render("Siguiente", True, (255, 255, 255))
+            self.screen.blit(tx, (20, 150))
             for i, row in enumerate(FORMAS[self.siguiente][0]):
-                for j, val in enumerate(row):
-                    if val:
+                for j, v in enumerate(row):
+                    if v:
                         pygame.draw.rect(
                             self.screen, COLORES[self.siguiente],
                             (20 + j * self.ancho_bloque,

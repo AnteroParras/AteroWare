@@ -1,3 +1,5 @@
+from time import sleep
+
 import pygame
 import random
 from src.layout import draw_frame, show_text
@@ -7,7 +9,13 @@ from core.gestor_audio import Audio
 
 class SnakeGame(MicrojuegoBase):
     def __init__(self, screen, tiempo, dificultad=1, infinity=False):
-        super().__init__(screen, 8, dificultad)
+        self.infinity = infinity
+
+        if infinity:
+            time = 999
+        else:
+            time = 8
+        super().__init__(screen, time,  dificultad)
 
         # Margen fijo
         self.margen = 40
@@ -91,13 +99,13 @@ class SnakeGame(MicrojuegoBase):
 
     def manejar_eventos(self, event):
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP and self.direccion != "ABAJO":
+            if event.key == pygame.K_UP or event.key == pygame.K_w and self.direccion != "ABAJO":
                 self.nueva_direccion = "ARRIBA"
-            elif event.key == pygame.K_DOWN and self.direccion != "ARRIBA":
+            elif event.key == pygame.K_DOWN or event.key == pygame.K_s and self.direccion != "ARRIBA":
                 self.nueva_direccion = "ABAJO"
-            elif event.key == pygame.K_LEFT and self.direccion != "DERECHA":
+            elif event.key == pygame.K_LEFT or event.key == pygame.K_a and self.direccion != "DERECHA":
                 self.nueva_direccion = "IZQUIERDA"
-            elif event.key == pygame.K_RIGHT and self.direccion != "IZQUIERDA":
+            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d and self.direccion != "IZQUIERDA":
                 self.nueva_direccion = "DERECHA"
             elif event.key == pygame.K_ESCAPE:
                 accion = self.menu.mostrar_pausa(self.screen)
@@ -165,9 +173,13 @@ class SnakeGame(MicrojuegoBase):
             text = "Game Over"
         else:
             if self.remaining_food > 1:
-                text = f"Come: {self.remaining_food} manzanas"
+                if self.infinity:
+                    text = f"{self.remaining_food} manzanas"
+                else:
+                    text = f"Come: {self.remaining_food} manzanas"
             elif self.remaining_food == 1:
-                text = f"Come: 1 manzana"
+                if not self.infinity:
+                    text = f"Come: 1 manzana"
             else:
                 text = f"Ganaste!!"
 
@@ -237,6 +249,7 @@ class SnakeGame(MicrojuegoBase):
         self.screen.blit(self.imagen_derrota, self.imagen_derrota_rect)
         pygame.display.flip()
 
+
     def mostrar_victoria(self):
         self.audio.detener()
         self.audio.reproducir("Fnaf.mp3")
@@ -264,14 +277,13 @@ class SnakeGame(MicrojuegoBase):
         while True:
             if self.win:
                 if self.remaining_food > 0:
-                    print(self.win)
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
                             pygame.quit()
                             return False
                         resultado = self.manejar_eventos(event)
                         if resultado == "exit_to_menu":
-                            return False
+                            return "exit_to_menu"
                     self.actualizar()
                     self.dibujar()
 
@@ -280,6 +292,9 @@ class SnakeGame(MicrojuegoBase):
             elif not self.derrota:
                 self.derrota = True
                 self.mostrar_derrota()
+                if self.infinity:
+                    sleep(4)
+                    return False
 
             pygame.display.flip()
 

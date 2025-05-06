@@ -49,7 +49,7 @@ class MicrojuegoBase:
                     return False
                 resultado = self.manejar_eventos(event)
                 if resultado == "exit_to_menu":
-                    return False  # o la lógica que haga volver al menú
+                    return "exit_to_menu"  # o la lógica que haga volver al menú
 
             self.actualizar()
             self.dibujar()

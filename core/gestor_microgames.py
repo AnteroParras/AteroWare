@@ -12,10 +12,13 @@ from microgames.tetris import Tetris
 class GameManager:
     def __init__(self, screen):
         self.screen = screen
-        self.minijuegos = [Tetris]  # Lista de clases de minijuegos
+        self.minijuegos = [SnakeGame, MicrojuegoExplotarBurbujas]  # Lista de clases de minijuegos
         self.indice = 0  # Lleva el progreso
         self.dificultad = 1
         self.macro_win = False
+
+    def reiniciar(self):
+        self.indice = 0
 
     def ejecutar_microjuego(self, time):
         resultado = False
@@ -33,7 +36,8 @@ class GameManager:
             self.indice += 1
 
             if resultado == "exit_to_menu":
-                return False  # o la lógica que haga volver al menú
+                self.indice = 0
+                return "T"  # o la lógica que haga volver al menú
 
             return resultado or self.macro_win
 

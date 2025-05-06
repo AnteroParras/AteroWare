@@ -248,7 +248,7 @@ class Menu:
                     for boton in botones:
                         if boton["rect"].collidepoint(event.pos):
                             if boton["texto"] == "Jugar":
-                                return  # Salir del menú y comenzar el juego
+                                return True # Salir del menú y comenzar el juego
                             elif boton["texto"] == "Opciones":
                                 self.mostrar_opciones(screen)
                             elif boton["texto"] == "Créditos":
@@ -260,107 +260,145 @@ class Menu:
                                 exit()
             reloj.tick(60)
 
+
     def mostrar_selector_microjuegos(self, screen):
-        font = pygame.font.Font(None, 36)
-        from microgames.macro_pong4D import Pong4D
-        from microgames.microgame_codigo import MicrojuegoEscribirCodigo
-        from microgames.microgame_diana import MicrojuegoDispararFlecha
-        from microgames.microgame_hankujas import MicrojuegoExplotarBurbujas
-        from microgames.microgame_snake import SnakeGame
-        from microgames.tetris import Tetris
-        microjuegos = [
-            {"nombre": "Tetris", "imagen": "../assets/thumbnails/tetris_title.jpg", "clase": Tetris},
-            {"nombre": "Snake", "imagen": "../assets/thumbnails/snake_title_2.png", "clase": SnakeGame},
-            {"nombre": "Flecha", "imagen": "../assets/thumbnails/arrow_title.png", "clase": MicrojuegoDispararFlecha},
-            {"nombre": "Explota", "imagen": "../assets/thumbnails/good_title.png", "clase": MicrojuegoExplotarBurbujas},
-            {"nombre": "Código", "imagen": "../assets/thumbnails/hacking_title.jpg", "clase": MicrojuegoEscribirCodigo},
-            {"nombre": "Pong4D", "imagen": "../assets/thumbnails/pong4d_title.jpg", "clase": Pong4D},
-        ]
+            import pygame
+            from math import sin
+            from core.gestor_sprites import GIFSprite
+            from core.gestor_audio import Audio
+            # Import dinámico de clases de juego
+            from microgames.macro_pong4D import Pong4D
+            from microgames.microgame_codigo import MicrojuegoEscribirCodigo
+            from microgames.microgame_diana import MicrojuegoDispararFlecha
+            from microgames.microgame_hankujas import MicrojuegoExplotarBurbujas
+            from microgames.microgame_snake import SnakeGame
+            from microgames.tetris import Tetris
 
-        for mj in microjuegos:
-            mj["img"] = pygame.image.load(mj["imagen"]).convert_alpha()
-            mj["img"] = pygame.transform.scale(mj["img"], (150, 150))
-            mj["texto_surf"] = font.render(mj["nombre"], True, (255, 255, 255))
+            # Definimos las tres pestañas y sus juegos
+            categorias = [
+                {"nombre": "Microjuegos", "lista": [
+                    {"nombre": "Explota", "clase": MicrojuegoExplotarBurbujas,
+                     "imagen": "../assets/thumbnails/good_title.png"},
+                    {"nombre": "Código", "clase": MicrojuegoEscribirCodigo,
+                     "imagen": "../assets/thumbnails/hacking_title.jpg"},
+                    {"nombre": "Flecha", "clase": MicrojuegoDispararFlecha,
+                     "imagen": "../assets/thumbnails/arrow_title.png"},
+                    {"nombre": "Snake", "clase": SnakeGame,
+                     "imagen": "../assets/thumbnails/snake_title_2.png"},
+                ]},
+                {"nombre": "Macrojuegos", "lista": [
+                    {"nombre": "Pong4D", "clase": Pong4D, "imagen": "../assets/thumbnails/pong4d_title.jpg"},
+                ]},
+                {"nombre": "Juegos especiales", "lista": [
+                    {"nombre": "Snake clasico", "clase": SnakeGame, "imagen": "../assets/thumbnails/snake_title_2.png"},
+                    {"nombre": "Tetris", "clase": Tetris, "imagen": "../assets/thumbnails/tetris_title.jpg"},
+                ]},
+            ]
 
-        columnas = 3
-        margen_vertical = 180
-        espacio = 40
-        ancho_total = columnas * 150 + (columnas - 1) * espacio
-        offset_x = (screen.get_width() - ancho_total) // 2
+            # Pre-carga de thumbnails y surfaces de texto
+            font = pygame.font.Font(None, 36)
+            for cat in categorias:
+                for mj in cat["lista"]:
+                    img = pygame.image.load(mj["imagen"]).convert_alpha()
+                    mj["img"] = pygame.transform.scale(img, (150, 150))
+                    mj["surf"] = font.render(mj["nombre"], True, (255, 255, 255))
 
-        reloj = pygame.time.Clock()
-        font_titulo = pygame.font.Font("../assets/fuentes/SuperMario256.ttf", 32)
-        titulo = "Selecciona un microjuego"
+            # Variables de UI
+            tabs = [cat["nombre"] for cat in categorias]
+            active_tab = 0
+            tab_font = pygame.font.Font(None, 48)
+            title_font = pygame.font.Font(None, 64)
+            spacing = 20
+            reloj = pygame.time.Clock()
+            fondo_gif = GIFSprite("../assets/menu/menu.gif", screen.get_width(), screen.get_height())
+            control_audio = Audio()
 
-        fondo_gif = GIFSprite("../assets/menu/menu.gif", screen.get_width(), screen.get_height())
+            while True:
+                fondo_gif.update()
+                fondo_gif.dibujar(screen)
 
-        control_audio = Audio()  # Asegúrate de crear la instancia aquí también
+                # Encabezado arcoíris
+                t = pygame.time.get_ticks()
+                rainbow_color = (
+                    int(128 + 127 * sin(t / 200)),
+                    int(128 + 127 * sin(t / 200 + 2)),
+                    int(128 + 127 * sin(t / 200 + 4))
+                )
+                header = title_font.render("Selecciona un microjuego", True, rainbow_color)
+                screen.blit(header, header.get_rect(center=(screen.get_width() // 2, 80)))
 
-        while True:
-            fondo_gif.update()
-            fondo_gif.dibujar(screen)
+                # Dibujar pestañas
+                x = spacing
+                tab_rects = []
+                for i, name in enumerate(tabs):
+                    color = (255, 255, 255) if i == active_tab else (180, 180, 180)
+                    surf = tab_font.render(name, True, color)
+                    rect = surf.get_rect(topleft=(x, 140))
+                    screen.blit(surf, rect)
+                    tab_rects.append(rect)
+                    x += rect.width + spacing
 
-            # Título animado
-            color_animado = (
-                128 + int(127 * sin(pygame.time.get_ticks() / 400)),
-                128 + int(127 * sin(pygame.time.get_ticks() / 500)),
-                255
-            )
-            titulo_surf = font_titulo.render(titulo, True, color_animado)
-            titulo_rect = titulo_surf.get_rect(center=(screen.get_width() // 2, 60))
-            screen.blit(titulo_surf, titulo_rect)
+                # Dibujar grid de juegos de la pestaña activa
+                juegos = categorias[active_tab]["lista"]
+                cols, gap = 3, 40
+                start_y = 200
+                total_w = cols * 150 + (cols - 1) * gap
+                offset_x = (screen.get_width() - total_w) // 2
 
-            mouse_pos = pygame.mouse.get_pos()
+                # Prepara factory individual para cada juego
+                for idx, mj in enumerate(juegos):
+                    if categorias[active_tab]["nombre"] == "Juegos especiales" and mj["nombre"] == "Snake clasico":
+                        orig = mj["clase"]
+                        mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
+                    else:
+                        mj["factory"] = mj["clase"]
 
-            # Dibujar microjuegos
-            for i, mj in enumerate(microjuegos):
-                fila = i // columnas
-                col = i % columnas
-                x = offset_x + col * (150 + espacio)
-                y = margen_vertical + fila * (150 + 60)
+                # Renderiza cada juego
+                for idx, mj in enumerate(juegos):
+                    row, col = divmod(idx, cols)
+                    x = offset_x + col * (150 + gap)
+                    y = start_y + row * (150 + 80)
+                    img_rect = pygame.Rect(x, y, 150, 150)
+                    pygame.draw.rect(screen, (30, 30, 30), img_rect.inflate(10, 10), border_radius=10)
+                    if img_rect.collidepoint(pygame.mouse.get_pos()):
+                        pygame.draw.rect(screen, (255, 255, 255), img_rect.inflate(4, 4), 2, border_radius=10)
+                    screen.blit(mj["img"], (x, y))
 
-                rect_img = pygame.Rect(x, y, 150, 150)
+                    # Texto con bamboleo vertical
+                    offset = int(5 * sin(pygame.time.get_ticks() / 300 + idx))
+                    txt_rect = mj["surf"].get_rect(center=(x + 75, y + 170 + offset))
+                    screen.blit(mj["surf"], txt_rect)
+                    mj["rect"] = img_rect
 
-                # Fondo de tarjeta
-                pygame.draw.rect(screen, (30, 30, 30), rect_img.inflate(10, 10), border_radius=10)
-                if rect_img.collidepoint(mouse_pos):
-                    # Hover: dibujar borde
-                    pygame.draw.rect(screen, (255, 255, 255), rect_img.inflate(4, 4), 2, border_radius=10)
+                # Botón Atrás
+                back_s = tab_font.render("Atrás", True, (255, 255, 255))
+                back_r = back_s.get_rect(center=(screen.get_width() // 2, screen.get_height() - 30))
+                screen.blit(back_s, back_r)
 
-                screen.blit(mj["img"], (x, y))
-                # Añadir desplazamiento vertical animado al texto
-                offset_animado = int(
-                    5 * sin(pygame.time.get_ticks() / 300 + i))  # i para que cada uno tenga un desfase diferente
-                texto_rect = mj["texto_surf"].get_rect(center=(x + 75, y + 170 + offset_animado))
-                screen.blit(mj["texto_surf"], texto_rect)
+                pygame.display.flip()
 
-                mj["rect"] = rect_img
+                # Eventos
+                for ev in pygame.event.get():
+                    if ev.type == pygame.QUIT:
+                        pygame.quit();
+                        exit()
+                    if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
+                        # Cambio de pestaña
+                        for i, r in enumerate(tab_rects):
+                            if r.collidepoint(ev.pos):
+                                active_tab = i
+                        # Selección de juego
+                        for mj in juegos:
+                            if mj.get("rect") and mj["rect"].collidepoint(ev.pos):
+                                control_audio.detener()
+                                juego = mj["factory"](screen, 10, 1)
+                                juego.ejecutar()
+                                control_audio.reproducir(archivo="Menu.mp3", loop=True)
+                        # Atrás
+                        if back_r.collidepoint(ev.pos):
+                            return
 
-            # Botón Atrás
-            font_boton = pygame.font.Font(None, 50)
-            boton_atras = font_boton.render("Atrás", True, (255, 255, 255))
-            rect_atras = boton_atras.get_rect(center=(screen.get_width() // 2, screen.get_height() - 50))
-            screen.blit(boton_atras, rect_atras)
-
-            pygame.display.flip()
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if rect_atras.collidepoint(event.pos):
-                        return
-                    for mj in microjuegos:
-                        if mj["rect"].collidepoint(event.pos):
-                            juego = mj["clase"](screen, 10, 1)
-                            juego.ejecutar()
-
-                            # Reproducir la música del menú después de terminar el microjuego
-                            control_audio.reproducir(archivo="Menu.mp3", loop=True)
-
-        reloj.tick(60)
-
+                reloj.tick(60)
 
     def mostrar_pausa(self, screen):
         """
