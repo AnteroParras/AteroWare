@@ -20,7 +20,7 @@ class MicrojuegoExplotarBurbujas(MicrojuegoBase):
         self.num_of_targets = 3 + int((dificultad-1)*1.5)
 
         self.win = False
-        self.musica = "A1.mp3"
+        self.musica = "man.mp3"
 
         self.cargar_sprites()
 
@@ -56,6 +56,18 @@ class MicrojuegoExplotarBurbujas(MicrojuegoBase):
                         if bubble.rect.collidepoint(mx, my):
                             bubble.image = pygame.image.load("../assets/microgames/explotar_burbujas/good.png")
                             bubble.image = pygame.transform.scale(bubble.image, (self.num_x, self.num_y))
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                accion = self.menu.mostrar_pausa(self.screen)
+                if accion == "continue":
+                    # simplemente salimos del menú de pausa
+                    pass
+                elif accion == "options":
+                    self.menu.mostrar_opciones(self.screen)
+                    # al cerrar opciones volverá aquí y saldrá de pausa
+                elif accion == "exit":
+                    # retornamos una señal para que el bucle superior maneje la salida
+                    return "exit_to_menu"
 
     def actualizar(self):
         """Actualizar estado del minijuego"""

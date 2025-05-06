@@ -6,11 +6,13 @@ from microgames.microgame_diana import MicrojuegoDispararFlecha
 from microgames.microgame_snake import SnakeGame
 from microgames.macro_pong4D import Pong4D
 from core.gestor_audio import Audio
+from microgames.tetris import Tetris
+
 
 class GameManager:
     def __init__(self, screen):
         self.screen = screen
-        self.minijuegos = [SnakeGame]  # Lista de clases de minijuegos
+        self.minijuegos = [Tetris]  # Lista de clases de minijuegos
         self.indice = 0  # Lleva el progreso
         self.dificultad = 1
         self.macro_win = False
@@ -30,6 +32,8 @@ class GameManager:
             resultado = minijuego.ejecutar()
             self.indice += 1
 
+            if resultado == "exit_to_menu":
+                return False  # o la lógica que haga volver al menú
 
             return resultado or self.macro_win
 

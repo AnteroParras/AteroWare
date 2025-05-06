@@ -99,6 +99,17 @@ class SnakeGame(MicrojuegoBase):
                 self.nueva_direccion = "IZQUIERDA"
             elif event.key == pygame.K_RIGHT and self.direccion != "IZQUIERDA":
                 self.nueva_direccion = "DERECHA"
+            elif event.key == pygame.K_ESCAPE:
+                accion = self.menu.mostrar_pausa(self.screen)
+                if accion == "continue":
+                    # simplemente salimos del menú de pausa
+                    pass
+                elif accion == "options":
+                    self.menu.mostrar_opciones(self.screen)
+                    # al cerrar opciones volverá aquí y saldrá de pausa
+                elif accion == "exit":
+                    # retornamos una señal para que el bucle superior maneje la salida
+                    return "exit_to_menu"
 
     def actualizar(self):
         self.direccion = self.nueva_direccion
@@ -258,8 +269,9 @@ class SnakeGame(MicrojuegoBase):
                         if event.type == pygame.QUIT:
                             pygame.quit()
                             return False
-                        self.manejar_eventos(event)
-
+                        resultado = self.manejar_eventos(event)
+                        if resultado == "exit_to_menu":
+                            return False
                     self.actualizar()
                     self.dibujar()
 

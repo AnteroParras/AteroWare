@@ -1,7 +1,7 @@
 import pygame
 from core.gestor_sprites import Sprite
 from core.gestor_audio import Audio
-
+from core.gestor_menus import Menu
 
 class MicrojuegoBase:
     def __init__(self, screen, tiempo, dificultad=1):
@@ -12,6 +12,7 @@ class MicrojuegoBase:
         self.win = False
         self.dificultad = dificultad
         self.musica = None # Música del minijuego
+        self.menu = Menu(screen)
 
     def cargar_sprites(self):
         """Carga los sprites específicos del minijuego (sobreescrito en hijos)."""
@@ -46,7 +47,9 @@ class MicrojuegoBase:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     return False
-                self.manejar_eventos(event)
+                resultado = self.manejar_eventos(event)
+                if resultado == "exit_to_menu":
+                    return False  # o la lógica que haga volver al menú
 
             self.actualizar()
             self.dibujar()
@@ -55,5 +58,6 @@ class MicrojuegoBase:
             # Verifica si se acabó el tiempo
             if (pygame.time.get_ticks() - inicio) / 1000 > self.tiempo_limite:
                 return self.win  # Minijuego perdido
+                self.audio.detener()
 
             reloj.tick(30)
