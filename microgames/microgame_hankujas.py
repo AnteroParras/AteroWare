@@ -77,11 +77,11 @@ class MicrojuegoExplotarBurbujas(MicrojuegoBase):
     def dibujar(self):
         """Dibuja los sprites en pantalla"""
         self.screen.fill((255, 255, 255))  # Fondo blanco
-        draw_frame()
+        draw_frame(self.screen)
         self.bubbles.draw(self.screen)
 
         if not self.win:
-            show_text("Haz feliz a Hank!!", justificacion="TOP")
+            show_text(self.screen, "Haz feliz a Hank!!", justificacion="TOP")
         else:
-            show_text("Ole que ole!!", justificacion="TOP")
+            show_text(self.screen,"Ole que ole!!", justificacion="TOP")
         pygame.display.flip()

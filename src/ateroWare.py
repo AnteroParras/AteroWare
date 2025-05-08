@@ -1,62 +1,80 @@
 import pygame
-import globals_config as gc
 
 from core.gestor_audio import Audio
 from core.gestor_microgames import GameManager
 from core.gestor_menus import Menu
 
-from layout import init, inner_time_safe_life, show_text, fill_screen, screen
+from layout import init, inner_time_safe_life, show_text, fill_screen
 
 
 # Inicialización de pygame y variables
-pygame.init()
-init()
-menu = Menu(screen)
+class AteroWare:
+    def __init__(self):
+        self.LIVES = 3
+        self.games_played = 0
+        self.running = True
+        self.jugar = False
 
-# Mostrar el menú principal
+        self.screen = pygame.display.set_mode((800, 692))
+        pygame.display.set_caption("AteroWare")
 
-# Bucle principal del juego
-running = True
-games_played = 0
-control_audio = Audio()
-control_juegos = GameManager(screen=screen)
+        self.menu = Menu(self.screen)
+        self.control_audio = Audio()
+        self.control_juegos = GameManager(screen=self.screen)
 
-jugar = False
+    def reiniciar(self):
+        self.LIVES = 3
+        self.games_played = 0
+        self.running = True
+        self.jugar = False
 
+        self.screen = pygame.display.set_mode((800, 692))
+        pygame.display.set_caption("AteroWare")
 
-def bucle_juego(LIVES=3, games_played=0, running=True):
-    while running and LIVES > 0 and not control_juegos.isTerminado():
-        control_audio.reproducir(archivo="Pirim.mp3")
-        inner_time_safe_life(2)
-        control_audio.detener()
+        self.menu = Menu(self.screen)
+        self.control_audio = Audio()
+        self.control_juegos = GameManager(screen=self.screen)
 
-        result = control_juegos.ejecutar_microjuego(7)  # Ejecuta el minijuego
+    def bucle_juego(self):
+        while self.running and self.LIVES > 0 and not self.control_juegos.isTerminado():
+            self.control_audio.reproducir(archivo="Pirim.mp3")
+            inner_time_safe_life(self.screen, 2)
+            self.control_audio.detener()
 
-        games_played += 1
+            result = self.control_juegos.ejecutar_microjuego(7)
 
-        if result == "T":
+            self.games_played += 1
+
+            if result == "T":
+                return False
+
+            if not result:
+                self.LIVES -= 1
+
+            if self.LIVES <= 0 or self.control_juegos.isTerminado():
+                self.running = False
+
+        self.reiniciar()
+
+        if self.LIVES > 0:
+            self.screen.fill((255, 255, 255))
+            pygame.display.flip()
+            self.menu.mostrar_menu(self.screen)
             return False
 
-        if not result:
-            gc.LIVES -= 1  # Pierde una vida si falla
+        else:
+            fill_screen(self.screen, "RED")
+            pygame.display.flip()
 
-        if gc.LIVES <= 0 or control_juegos.isTerminado():
-            running = False  # Si no quedan minijuegos o vidas pierdes
-
-    if gc.LIVES > 0:
-        fill_screen("WHITE")
-        show_text("Ole ole los caracoles")
-        pygame.display.flip()
-        menu.mostrar_menu(screen)
-
-    else:
-        fill_screen("RED")
-        pygame.display.flip()
+    def bucle_principal(self):
+        while True:
+            if not self.jugar:
+                self.jugar = self.menu.mostrar_menu(self.screen)
+                self.LIVES = 3
+            else:
+                self.jugar = self.bucle_juego()
 
 
-while True:
-    if not jugar:
-        jugar = menu.mostrar_menu(screen)
-    else:
-        jugar = bucle_juego()
-
+pygame.init()
+AteroWare = AteroWare()
+AteroWare.bucle_principal()

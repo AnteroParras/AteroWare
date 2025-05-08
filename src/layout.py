@@ -12,9 +12,6 @@ COLORS = {
 WIDTH, HEIGHT = 800, 692
 
 
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-
-
 def init():
     """
     Inicializa la pantalla y fuente
@@ -23,7 +20,7 @@ def init():
     font = pygame.font.Font(None, 36)
 
 
-def draw_frame(correction_x=0, correction_y=0):
+def draw_frame(screen, correction_x=0, correction_y=0):
     """
     Dibuja el marco de los minijuegos
     """
@@ -60,7 +57,7 @@ def draw_frame(correction_x=0, correction_y=0):
                       HEIGHT - 2 * GRADIENT_FRAME_THICKNESS - 2 * EXTERNAL_FRAME_THICKNESS))
 
 
-def fill_screen(color):
+def fill_screen(screen, color):
     screen.fill(COLORS[color])
 
 
@@ -80,7 +77,7 @@ def pause_menu():
     return None  #Rellenar
 
 
-def show_text(texto, size=36, justificacion='MIDDLE', color=(0, 0, 0), edge=False):
+def show_text(screen, texto, size=36, justificacion='MIDDLE', color=(0, 0, 0), edge=False):
     """
     Muestra un texto en pantalla
 
@@ -115,7 +112,7 @@ def show_text(texto, size=36, justificacion='MIDDLE', color=(0, 0, 0), edge=Fals
         screen.blit(texto_renderizado, (x_pos, y_pos + i * fuente.get_height()))  # Dibujar la línea
 
 
-def inner_time_safe_life(time):
+def inner_time_safe_life(screen, time):
     """
     Pantalla entre microjuegos
 
@@ -133,8 +130,8 @@ def inner_time_safe_life(time):
     while True:
         screen.fill(COLORS["BLACK"])
 
-        show_text(total_lives, justificacion='TOP', color=(255, 255, 255))
-        show_text('Preparate para el siguiente micro-juego!!\n\n' + str(time), color=(255, 255, 255))
+        show_text(screen, total_lives, justificacion='TOP', color=(255, 255, 255))
+        show_text(screen, 'Preparate para el siguiente micro-juego!!\n\n' + str(time), color=(255, 255, 255))
         pygame.display.flip()
 
         for event in pygame.event.get():
