@@ -166,7 +166,7 @@ class SnakeGame(MicrojuegoBase):
                     pygame.draw.rect(self.screen, color, (x, y, self.tamano_celda_ancho, self.tamano_celda_alto))
 
     def dibujar(self):
-        draw_frame()
+        draw_frame(self.screen)
         self.dibujar_fondo()
 
         if not self.win:
@@ -183,7 +183,7 @@ class SnakeGame(MicrojuegoBase):
             else:
                 text = f"Ganaste!!"
 
-        show_text(text, size=40, justificacion='TOP', color=(0, 0, 0), edge=False)
+        show_text(self.screen, text, size=40, justificacion='TOP', color=(0, 0, 0), edge=False)
 
         for i, segmento in enumerate(self.snake):
             x, y = segmento

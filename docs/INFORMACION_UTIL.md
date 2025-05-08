@@ -8,20 +8,23 @@ En cambio usando import **NO PODEMOS RENOMBRAR** pero **SI PODEMOS MODIFICAR**, 
 - En el diccionario de colores, que tampoco se debe modificar usamos from
 - etc...
 
-### DICCIONARIOS DEFINIDOS
-Usar diccionarios es bastante comodo para mantener una coherencia, es como una array con un index personalizado. En este caso lo he utlizado unicamente para los colores
-
 ### SPRITES_LOADERS
 Esta archivo tiene dos clases implementada ( y una tercera en cocción si lo ves necesario ):
 - Sprite: Sirve para cargar imagenes de casi cualquier tipo ( mejor usar PNG )
 - GIFloader: Sirve para cargar GIFS, hereda de Sprite
-- VideoLoader: Serviría para mostrar video
 
 ### NOMBRE EN MICROJUEGOS
 Antes era totalmente necesario empezase por microgame por la funcion que se utilizaba para recopilarlos pero ya no hace falta, cualqueir nombre es aceptado
 
-### IMPORTANTE
-Reviste los cambios realizados en:
-- AteroWare, ahora adaptado a la nueva forma de cargar los microjuegos con gestor_microjuegos
-- GestorMicrojuegos, ahora usando la dificultad como parametro
-- Las nuevas funciones en gestor_microjuegos, funciones sencillas pero hay que usar
+Solo debe incluirse en el gestor de microjuegos
+
+### AUDIO
+Todo el audio se controla con gestor_audio.Audio().
+
+Por defecto el metodo ejecutar de la clase MicrojuegoBase controla el audio, solo teniendo que definir el audio con el atributo self.musica.
+
+Si quieres comportamientos distintos hay que sobreescribir el metodo ejecutar en las clases herencia
+
+
+### SFX
+Si se quiere incluir efectos de sonido hay que utilizar pygame.mixer.sound.

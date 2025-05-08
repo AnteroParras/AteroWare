@@ -43,10 +43,12 @@ COLORES = {
 # Original NES gravity speeds in frames (60fps) per level 0-10+\N
 GRAVITY_FRAMES = [48, 43, 38, 33, 28, 23, 18, 13, 8, 6] + [5] * 91
 
+
 class Tetris(MicrojuegoBase):
-    def __init__(self, screen, tiempo, dificultad=1):
-        super().__init__(screen, 999, dificultad)
+    def __init__(self, screen, tiempo, dificultad=1, infinity=False):
+        super().__init__(screen, 999 if infinity else 12, dificultad)
         self.musica = "T1.mp3"
+        self.infinity = infinity
 
         self.ancho_bloque = 30
         self.columnas = 10
@@ -55,6 +57,10 @@ class Tetris(MicrojuegoBase):
         self.margen_y = (screen.get_height() - self.filas * self.ancho_bloque) // 2
         self.grid = [[0] * self.columnas for _ in range(self.filas)]
         self.bolsa = []
+
+        self.ancho = screen.get_width()
+        self.height = screen.get_height()
+
         self.siguiente = None
         self.actual = None
         self.pos = [0, 3]
@@ -64,7 +70,7 @@ class Tetris(MicrojuegoBase):
         self.level = 0
         self.lines = 0
         # timing
-        self.delay = GRAVITY_FRAMES[self.level] * (1000/60)
+        self.delay = GRAVITY_FRAMES[self.level] * (1000 / 60)
         self.fast = False
         self.lock_delay = 500
         self.lock_time = None
@@ -72,6 +78,7 @@ class Tetris(MicrojuegoBase):
         self.guarda = None
         self.can_store = True
         self.score = 0
+
         # rotation flag
         self.last_rotate = False
         self._fill_bag()
@@ -136,6 +143,8 @@ class Tetris(MicrojuegoBase):
                 self._rotate(-1)
             elif event.key == pygame.K_LSHIFT and self.can_store:
                 self._store()
+            elif event.key == pygame.K_SPACE:
+                self._hard_drop()
             elif event.key == pygame.K_ESCAPE:
                 accion = self.menu.mostrar_pausa(self.screen)
                 if accion == "continue":
@@ -160,7 +169,7 @@ class Tetris(MicrojuegoBase):
 
     def actualizar(self):
         # update level speed
-        self.delay = GRAVITY_FRAMES[min(self.level, len(GRAVITY_FRAMES)-1)] * (1000/60)
+        self.delay = GRAVITY_FRAMES[min(self.level, len(GRAVITY_FRAMES) - 1)] * (1000 / 60)
         now = pygame.time.get_ticks()
         spd = 50 if self.fast else self.delay
         if now - self.last > spd:
@@ -193,20 +202,29 @@ class Tetris(MicrojuegoBase):
         self.grid = new
         # update lines and level
         self.lines += cnt
+
+        if not self.infinity:
+            if self.lines >= self.dificultad:
+                self.win = True
+
         if cnt > 0:
-            self.level = self.lines // 1
-            if self.level == 5:
+            self.level = self.lines // 4
+            if self.level == 8:
                 self.audio.detener()
                 self.musica = "T2.mp3"
                 self.audio.reproducir(self.musica)
         # scoring
         self.score += 100 * cnt + (50 * cnt if cnt > 1 else 0)
-        self.win = cnt > 0
         self._next()
+
+    def _hard_drop(self):
+        while self._can_place(FORMAS[self.actual][self.rot], (1, 0), self.rot):
+            self.pos[0] += 1
+        self._lock()
 
     def dibujar(self):
         super().dibujar()
-        draw_frame()
+        draw_frame(self.screen)
         pygame.draw.rect(
             self.screen, (255, 255, 255),
             (self.margen_x - 2, self.margen_y - 2,
@@ -217,10 +235,16 @@ class Tetris(MicrojuegoBase):
         font = pygame.font.SysFont(None, 24)
         txt_score = font.render(f"Puntos: {self.score}", True, (255, 255, 255))
         txt_lines = font.render(f"Lineas: {self.lines}", True, (255, 255, 255))
-        txt_level = font.render(f"Nivel: {self.level}", True, (255, 255, 255))
-        self.screen.blit(txt_score, (20, 280))
-        self.screen.blit(txt_lines, (20, 310))
-        self.screen.blit(txt_level, (20, 340))
+        self.screen.blit(txt_score, (80, 280))
+        self.screen.blit(txt_lines, (80, 310))
+
+        if self.infinity:
+            txt_level = font.render(f"Nivel: {self.level}", True, (255, 255, 255))
+            self.screen.blit(txt_level, (80, 340))
+        else:
+            txt_objetivo = font.render(f"¡Haz {self.dificultad} lineas!", True, (255, 255, 255))
+            self.screen.blit(txt_objetivo, (int(self.ancho // 2 * 0.89), 340))
+
         # draw grid and pieces
         for i in range(self.filas):
             for j in range(self.columnas):
@@ -245,26 +269,59 @@ class Tetris(MicrojuegoBase):
         # stored piece
         if self.guarda:
             tx = pygame.font.SysFont(None, 24).render("Guardado", True, (255, 255, 255))
-            self.screen.blit(tx, (20, 20))
+            self.screen.blit(tx, (40, 40))
             for i, row in enumerate(FORMAS[self.guarda][0]):
                 for j, v in enumerate(row):
                     if v:
                         pygame.draw.rect(
                             self.screen, COLORES[self.guarda],
-                            (20 + j * self.ancho_bloque,
-                             40 + i * self.ancho_bloque,
+                            (40 + j * self.ancho_bloque,
+                             60 + i * self.ancho_bloque,
                              self.ancho_bloque, self.ancho_bloque)
                         )
         # next piece
         if self.siguiente:
             tx = pygame.font.SysFont(None, 24).render("Siguiente", True, (255, 255, 255))
-            self.screen.blit(tx, (20, 150))
+            self.screen.blit(tx, (80, 150))
             for i, row in enumerate(FORMAS[self.siguiente][0]):
                 for j, v in enumerate(row):
                     if v:
                         pygame.draw.rect(
                             self.screen, COLORES[self.siguiente],
-                            (20 + j * self.ancho_bloque,
-                             170 + i * self.ancho_bloque,
+                            (80 + j * self.ancho_bloque,
+                             190 + i * self.ancho_bloque,
                              self.ancho_bloque, self.ancho_bloque)
                         )
+
+    def ejecutar(self):
+        """Ejecuta el bucle del minijuego y devuelve si ganó o perdió"""
+        self.audio.reproducir(self.musica)
+        reloj = pygame.time.Clock()
+        inicio = pygame.time.get_ticks()
+
+        while True:
+            self.screen.fill((0, 0, 0))  # Fondo negro
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return False
+                resultado = self.manejar_eventos(event)
+                if resultado == "exit_to_menu":
+                    return "exit_to_menu"  # o la lógica que haga volver al menú
+
+            if not self.win:
+                self.actualizar()
+
+            self.dibujar()
+            if self.win and not self.infinity:
+                font = pygame.font.SysFont(None, 48)
+                txt_score = font.render(f"YEEEEY", True, (255, 255, 255))
+                self.screen.blit(txt_score, (int(self.ancho // 2 * 0.85), 280))
+            pygame.display.flip()
+
+            # Verifica si se acabó el tiempo
+            if (pygame.time.get_ticks() - inicio) / 1000 > self.tiempo_limite:
+                self.audio.detener()
+                return self.win  # Minijuego perdido
+
+            reloj.tick(30)

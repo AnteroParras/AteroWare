@@ -1,29 +1,34 @@
 📂 AteroWare
 │── 📂 assets
+│   ├── 📂 fuentes
+│   ├── 📂 menu
+│   ├── 📂 thumbanails
 │   ├── 📂 musica
-│       ├── 🎵 A1.mp3
 │   ├── 📂 microgames
 │       ├── 📂 explotar_burbujas/
 │           ├── 🎨 good.png
 │           ├── 🎨 bad.png
 │── 📂 core
-│   ├── 🎮 gestor_minijuegos.py   <-- Maneja los minijuegos
+│   ├── 🎮 gestor_microgames.py   <-- Maneja los minijuegos
 │   ├── 🎵 gestor_audio.py  <-- Maneja la música
 │   ├── 🎨 gestor_sprites.py <-- Carga sprites
-│   ├── 🖥️ gestor_escenas.py  <-- Maneja las escenas
-│── 📂 microjuegos
-│   ├── 🎮 microjuego_base.py  <-- Clase base para minijuegos
-│   ├── 🎮 microjuego1.py
-│── 📂 scenes
-│── 📂 src
-│   ├── 🎮 ateroWare.py             # Archivo principal del juego
-│   ├── ⚙️ global_configs.py        # Configuraciones globales
-│   ├── 🎨 layout.py                # Gestión de diseño de la UI
-│   ├── 🎮 microgames_prev.py            # Lógica de los minijuegos
+│   ├── 🖥️ gestor_menus.py  <-- Maneja los menus
+│
 │── 📂 docs
 │   ├── 📜 TAREAS.md
 │   ├── 📜 INFORMACION_UTIL.md
 │   ├── 📜 MINIJUEGOS.txt
 │   ├── 📜 Estructura_proyecto.txt
+│
+│── 📂 microjuegos
+│   ├── 🎮 microjuego_base.py  <-- Clase base para minijuegos
+│   ├── 🎮 microjuego1.py
+│
+│── 📂 src
+│   ├── 🎮 ateroWare.py             # Archivo principal del juego
+│   ├── ⚙️ global_configs.py        # Configuraciones globales
+│   ├── 🎨 layout.py                # Gestión de diseño de la UI
+│
 │── 📂 tests
+│── 📜 CHANGELOG.py
 │── 📜 Readme.py

@@ -272,7 +272,7 @@ class Menu:
             from microgames.microgame_diana import MicrojuegoDispararFlecha
             from microgames.microgame_hankujas import MicrojuegoExplotarBurbujas
             from microgames.microgame_snake import SnakeGame
-            from microgames.tetris import Tetris
+            from microgames.microgame_tetris import Tetris
 
             # Definimos las tres pestañas y sus juegos
             categorias = [
@@ -285,13 +285,15 @@ class Menu:
                      "imagen": "../assets/thumbnails/arrow_title.png"},
                     {"nombre": "Snake", "clase": SnakeGame,
                      "imagen": "../assets/thumbnails/snake_title_2.png"},
+                    {"nombre": "Tetris", "clase": Tetris,
+                     "imagen": "../assets/thumbnails/tetris_title.jpg"},
                 ]},
                 {"nombre": "Macrojuegos", "lista": [
                     {"nombre": "Pong4D", "clase": Pong4D, "imagen": "../assets/thumbnails/pong4d_title.jpg"},
                 ]},
                 {"nombre": "Juegos especiales", "lista": [
                     {"nombre": "Snake clasico", "clase": SnakeGame, "imagen": "../assets/thumbnails/snake_title_2.png"},
-                    {"nombre": "Tetris", "clase": Tetris, "imagen": "../assets/thumbnails/tetris_title.jpg"},
+                    {"nombre": "Tetris clasico", "clase": Tetris, "imagen": "../assets/thumbnails/tetris_title.jpg"},
                 ]},
             ]
 
@@ -348,6 +350,9 @@ class Menu:
                 # Prepara factory individual para cada juego
                 for idx, mj in enumerate(juegos):
                     if categorias[active_tab]["nombre"] == "Juegos especiales" and mj["nombre"] == "Snake clasico":
+                        orig = mj["clase"]
+                        mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
+                    if categorias[active_tab]["nombre"] == "Juegos especiales" and mj["nombre"] == "Tetris clasico":
                         orig = mj["clase"]
                         mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
                     else:

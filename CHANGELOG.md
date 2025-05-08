@@ -70,3 +70,32 @@
   
 - ### **Areglado**:
   - Se ha arreglado incompatibilidades con la gestion de microjuegos y macrojuegos
+
+
+## [0.8] :  24 - 04 - 2025
+- ### **Añadido**:
+  - Gestor de menus
+  - Gran cantidad de assets
+  
+- ### **Cambiado**:
+  - Se han puesto audios, efectos y gifs
+  
+## [0.8.6] :  06 - 05 - 2025
+- ### **Añadido**:
+  - Se ha añadido el microjuego Tetris
+  - Se ha creado un nuevo menu, seleccion de minijuegos
+  - Se han creado juegos especiales llamados "Infinity"
+  
+- ### **Arreglado**
+  - Se ha arreglado el problema de crasheo al abrir juegos
+  - Pong4D ya se puede ejecutar correctamente
+
+
+## [0.9] :  08 - 05 - 2025
+- ### **Cambiado**:
+  - Se ha modificado por completo el archivo Ateroware.py, ahora es una clase en si misma
+  - El bucle de juego se ha actualizado, aceptando ahora reinicio de juegos
+
+- ### **Arreglado**
+  - Se puede poner en pausa todos los juegos sin que haya fallos
+  - Pong4D ya se puede cerrar correctamente
