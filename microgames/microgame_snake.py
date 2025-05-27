@@ -6,8 +6,10 @@ from src.layout import draw_frame, show_text
 from microgames.microgame_base import MicrojuegoBase
 from core.gestor_sprites import Sprite
 from core.gestor_audio import Audio
+from core.config import Config
 
 class SnakeGame(MicrojuegoBase):
+    """Microjuego de la serpiente"""
     def __init__(self, screen, tiempo, dificultad=1, infinity=False):
         self.infinity = infinity
 
@@ -91,6 +93,7 @@ class SnakeGame(MicrojuegoBase):
         self.derrota = False
 
     def generar_comida(self):
+        """Genera una posición aleatoria para la comida dentro de las celdas disponibles."""
         num_celdas_x = self.ancho // self.tamano_celda_ancho
         num_celdas_y = self.alto // self.tamano_celda_alto
         x = random.randint(0, num_celdas_x - 1) * self.tamano_celda_ancho + self.margen
@@ -98,6 +101,7 @@ class SnakeGame(MicrojuegoBase):
         return x, y
 
     def manejar_eventos(self, event):
+        """Maneja los eventos del teclado y el ratón."""
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP or event.key == pygame.K_w and self.direccion != "ABAJO":
                 self.nueva_direccion = "ARRIBA"
@@ -120,6 +124,7 @@ class SnakeGame(MicrojuegoBase):
                     return "exit_to_menu"
 
     def actualizar(self):
+        """Actualiza la posición de la serpiente y verifica colisiones."""
         self.direccion = self.nueva_direccion
         x, y = self.snake[0]
 
@@ -152,6 +157,7 @@ class SnakeGame(MicrojuegoBase):
             self.win = True
 
     def dibujar_fondo(self):
+        """Dibuja el fondo del juego con un patrón de celdas."""
         for i in range(18):
             for j in range(18):
                 x = self.margen + i * self.tamano_celda_ancho
@@ -166,6 +172,7 @@ class SnakeGame(MicrojuegoBase):
                     pygame.draw.rect(self.screen, color, (x, y, self.tamano_celda_ancho, self.tamano_celda_alto))
 
     def dibujar(self):
+        """Dibuja la serpiente, la comida y el texto en pantalla."""
         draw_frame(self.screen)
         self.dibujar_fondo()
 
@@ -233,6 +240,7 @@ class SnakeGame(MicrojuegoBase):
         self.food_sprite.dibujar(self.screen)
 
     def mostrar_derrota(self):
+        """Muestra la pantalla de derrota con una superposición oscura y la imagen de derrota."""
         self.audio.detener()
         self.audio.reproducir("BooBoo.mp3")
 
@@ -251,6 +259,7 @@ class SnakeGame(MicrojuegoBase):
 
 
     def mostrar_victoria(self):
+        """Muestra la pantalla de victoria"""
         self.audio.detener()
         self.audio.reproducir("Fnaf.mp3")
         self.remaining_food -= 1
@@ -270,9 +279,12 @@ class SnakeGame(MicrojuegoBase):
 
     def ejecutar(self):
         self.audio.reproducir("Snake.mp3")
+        if Config.mostrar_ayuda:
+            self.mostrar_controles(self.screen, "Controles:\nFlechas direccionales/WASD para mover a la serpiente")
 
         reloj = pygame.time.Clock()
         inicio = pygame.time.get_ticks()
+
 
         while True:
             if self.win:

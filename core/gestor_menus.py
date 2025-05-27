@@ -3,6 +3,7 @@ from math import sin, radians
 
 from core.gestor_audio import Audio
 from core.gestor_sprites import GIFSprite
+from core.config import Config  # Asegúrate de tener la clase Config como en la respuesta anterior
 
 
 
@@ -35,35 +36,45 @@ class Menu:
         return lineas
 
     def mostrar_opciones(self, screen):
-        """Muestra la pantalla de opciones con animación de bamboleo en el texto y un botón para volver al menú principal."""
         fondo_gif = GIFSprite("../assets/menu/menu.gif", screen.get_width(), screen.get_height())
         font = pygame.font.Font(None, 50)
-        texto_opciones = "Ta difisil implementarlo ahora, sorry :( "
+        texto_opciones = "Opciones"
         lineas_texto = self.dividir_texto(texto_opciones, font, screen.get_width() - 40)
 
+        # Botón ayuda ON/OFF
+        ayuda_rect = pygame.Rect(screen.get_width() // 2 - 100, 250, 200, 60)
+
+        # Botón atrás
         boton_atras = {"texto": "Atrás", "rect": None, "angulo": 0}
         boton_atras["superficie"] = font.render(boton_atras["texto"], True, (255, 255, 255))
         boton_atras["rect"] = boton_atras["superficie"].get_rect(
             center=(screen.get_width() // 2, screen.get_height() - 100))
 
-        angulo_incremento = 1.5  # Velocidad de rotación
+        angulo_incremento = 1.5
         reloj = pygame.time.Clock()
 
         while True:
-            fondo_gif.update()  # Actualizar el fotograma del GIF
-            fondo_gif.dibujar(screen)  # Dibujar el GIF en la pantalla
+            fondo_gif.update()
+            fondo_gif.dibujar(screen)
 
-            # Dibujar texto dividido en líneas con animación de bamboleo
+            # Título con animación
             y_offset = 100
             for linea in lineas_texto:
                 superficie_texto = font.render(linea, True, (255, 255, 255))
                 superficie_rotada = pygame.transform.rotate(superficie_texto,
-                                                            sin(pygame.time.get_ticks() / 200) * 2)  # Cambia el ángulo de rotación, mas grande = mas angulo duh
+                                                            sin(pygame.time.get_ticks() / 200) * 2)
                 texto_rect = superficie_rotada.get_rect(center=(screen.get_width() // 2, y_offset))
                 screen.blit(superficie_rotada, texto_rect)
                 y_offset += 50
 
-            # Dibujar botón "Atrás" con animación de bamboleo
+            # Botón ayuda ON/OFF
+            color_ayuda = (0, 200, 0) if Config.mostrar_ayuda else (200, 0, 0)
+            pygame.draw.rect(screen, color_ayuda, ayuda_rect, border_radius=15)
+            texto_ayuda = "Ayuda: ON" if Config.mostrar_ayuda else "Ayuda: OFF"
+            surf_ayuda = font.render(texto_ayuda, True, (255, 255, 255))
+            screen.blit(surf_ayuda, surf_ayuda.get_rect(center=ayuda_rect.center))
+
+            # Botón atrás con animación
             boton_atras["angulo"] += angulo_incremento
             boton_atras["angulo"] %= 360
             superficie_rotada = pygame.transform.rotate(boton_atras["superficie"],
@@ -78,11 +89,12 @@ class Menu:
                     pygame.quit()
                     exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if boton_atras["rect"].collidepoint(event.pos):
-                        return  # Volver al menú principal
+                    if ayuda_rect.collidepoint(event.pos):
+                        Config.mostrar_ayuda = not Config.mostrar_ayuda
+                    elif boton_atras["rect"].collidepoint(event.pos):
+                        return
 
             reloj.tick(60)
-
     def mostrar_creditos(self, screen):
         """Muestra la pantalla de créditos con animación de bamboleo en el texto y un botón para volver al menú principal."""
         fondo_gif = GIFSprite("../assets/menu/menu.gif", screen.get_width(), screen.get_height())
@@ -353,17 +365,18 @@ class Menu:
 
                 # Prepara factory individual para cada juego
                 for idx, mj in enumerate(juegos):
-                    if categorias[active_tab]["nombre"] == "Juegos especiales" and mj["nombre"] == "Snake clasico":
-                        orig = mj["clase"]
-                        mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
-                    if categorias[active_tab]["nombre"] == "Juegos especiales" and mj["nombre"] == "Tetris clasico":
-                        orig = mj["clase"]
-                        mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
-                    if categorias[active_tab]["nombre"] == "Juegos especiales" and mj["nombre"] == "Flappy Bird infinito":
-                        orig = mj["clase"]
-                        mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
-                    else:
-                        mj["factory"] = mj["clase"]
+                    mj["factory"] = mj["clase"]  # Por defecto
+
+                    if categorias[active_tab]["nombre"] == "Juegos especiales":
+                        if mj["nombre"] == "Snake clasico":
+                            orig = mj["clase"]
+                            mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
+                        elif mj["nombre"] == "Tetris clasico":
+                            orig = mj["clase"]
+                            mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
+                        elif mj["nombre"] == "Flappy Bird infinito":
+                            orig = mj["clase"]
+                            mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
 
                 # Renderiza cada juego
                 for idx, mj in enumerate(juegos):

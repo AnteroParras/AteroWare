@@ -5,6 +5,7 @@ from microgames.microgame_base import MicrojuegoBase
 
 
 class MicrojuegoEscribirCodigo(MicrojuegoBase):
+    """Microjuego donde el jugador debe escribir código Python, revelando letras por cada tecla presionada."""
     def __init__(self, screen, tiempo, dificultad=1):
         super().__init__(screen, tiempo, dificultad)
 

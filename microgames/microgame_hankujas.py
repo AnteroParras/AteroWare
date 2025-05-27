@@ -3,7 +3,7 @@ import pygame
 from src.layout import draw_frame, show_text
 from microgames.microgame_base import MicrojuegoBase
 from core.gestor_sprites import Sprite
-
+from core.config import Config
 
 class MicrojuegoExplotarBurbujas(MicrojuegoBase):
     def __init__(self, screen, time, dificultad=1):
@@ -85,3 +85,33 @@ class MicrojuegoExplotarBurbujas(MicrojuegoBase):
         else:
             show_text(self.screen,"Ole que ole!!", justificacion="TOP")
         pygame.display.flip()
+
+    def ejecutar(self):
+        """Ejecuta el bucle del minijuego y devuelve si ganó o perdió"""
+        self.audio.reproducir(self.musica)
+        if Config.mostrar_ayuda:
+            self.mostrar_controles(self.screen, "\n¡Click Izquierdo en las caras tristes!")
+
+        reloj = pygame.time.Clock()
+        inicio = pygame.time.get_ticks()
+
+        while True:
+            self.screen.fill((0, 0, 0))  # Fondo negro
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return False
+                resultado = self.manejar_eventos(event)
+                if resultado == "exit_to_menu":
+                    return "exit_to_menu"  # o la lógica que haga volver al menú
+
+            self.actualizar()
+            self.dibujar()
+            pygame.display.flip()
+
+            # Verifica si se acabó el tiempo
+            if (pygame.time.get_ticks() - inicio) / 1000 > self.tiempo_limite:
+                return self.win  # Minijuego perdido
+                self.audio.detener()
+
+            reloj.tick(30)

@@ -4,19 +4,21 @@ from time import sleep
 from microgames.microgame_base import MicrojuegoBase
 from core.gestor_audio import Audio
 from core.gestor_sprites import Sprite
+from core.config import Config
 
 class MicrojuegoFlappyBird(MicrojuegoBase):
+    """Microjuego inspirado en Flappy Bird, donde el jugador controla un pájaro que debe evitar obstáculos."""
     def __init__(self, screen, time, dificultad, infinity=False):
         self.infinity = infinity
 
         super().__init__(screen, time, dificultad)
         self.audio = Audio()
-        self.music_file = "FinalBoss.mp3"
+        self.music_file = "PolloLoco.mp3"
 
         self.SCREEN_WIDTH = screen.get_width()
         self.SCREEN_HEIGHT = screen.get_height()
         self.BIRD_SIZE = 30
-        self.PIPE_WIDTH = 80
+        self.PIPE_WIDTH = 120
         self.PIPE_GAP = 200
         self.dificultad = dificultad
         self.PIPE_SPEED = 3 + 2 * (self.dificultad)
@@ -24,7 +26,7 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
         self.FLAP_STRENGTH = -10
 
         if infinity:
-            self.tuberias_para_ganar = 999
+            self.tuberias_para_ganar = float('inf')  # Juego infinito, no hay objetivo de tuberías
         else:
             if self.dificultad == 1:
                 self.tuberias_para_ganar = 5
@@ -34,7 +36,9 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
                 self.tuberias_para_ganar = 12
 
         self.bird_sprite = Sprite("../assets/microgames/gato_enfadao.jpg", self.BIRD_SIZE, self.BIRD_SIZE)
-        self.pipe_sprite = Sprite("../assets/microgames/gato_porte.jpg", self.PIPE_WIDTH, self.SCREEN_HEIGHT)
+        self.pipe_sprite = Sprite("../assets/microgames/pollovolador/entubados.png", self.PIPE_WIDTH, self.SCREEN_HEIGHT)
+        self.fondo = Sprite("../assets/microgames/pollovolador/PolloFondo.png", screen.get_width(), screen.get_height())
+
 
         # Cargar imágenes de victoria y derrota
         self.imagen_victoria = pygame.image.load("../assets/microgames/pollovolador/angry_win.jpg").convert_alpha()
@@ -51,6 +55,7 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
         self._crear_tubo()
 
     def manejar_eventos(self, event):
+        """Maneja los eventos del microjuego, como el salto del pájaro y la pausa."""
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 accion = self.menu.mostrar_pausa(self.screen)
@@ -63,6 +68,7 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
         return None
 
     def _crear_tubo(self):
+        """Crea un nuevo tubo con una altura aleatoria dentro de los límites de la pantalla."""
         pipe_height = random.randint(100, self.SCREEN_HEIGHT - self.PIPE_GAP - 100)
         self.pipes.append({
             "x": self.SCREEN_WIDTH,
@@ -72,6 +78,7 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
         })
 
     def _mover_tubos(self):
+        """Mueve los tubos hacia la izquierda y elimina los que ya no están en pantalla."""
         for pipe in self.pipes:
             pipe["x"] -= self.PIPE_SPEED
         self.pipes = [pipe for pipe in self.pipes if pipe["x"] + self.PIPE_WIDTH > 0]
@@ -79,6 +86,7 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
             self._crear_tubo()
 
     def _dibujar_tubos(self):
+        """Dibuja los tubos en la pantalla."""
         for pipe in self.pipes:
             # Tubo superior
             self.pipe_sprite.image = pygame.transform.flip(self.pipe_sprite.image, False, True)
@@ -90,6 +98,7 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
             self.pipe_sprite.dibujar(self.screen)
 
     def _verificar_colisiones(self):
+        """Verifica si el pájaro ha colisionado con los tubos o los bordes de la pantalla."""
         bird_rect = pygame.Rect(self.SCREEN_WIDTH // 2, self.bird_y, self.BIRD_SIZE, self.BIRD_SIZE)
         if self.bird_y <= 0 or self.bird_y + self.BIRD_SIZE >= self.SCREEN_HEIGHT:
             return True
@@ -101,6 +110,7 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
         return False
 
     def _actualizar_puntaje(self):
+        """Actualiza el puntaje del jugador al pasar por los tubos."""
         for pipe in self.pipes:
             # Si el pájaro pasa el centro del tubo y no se ha contado aún
             if not pipe["cruzado"] and pipe["x"] + self.PIPE_WIDTH < self.SCREEN_WIDTH // 2:
@@ -108,6 +118,7 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
                 pipe["cruzado"] = True
 
     def mostrar_derrota(self):
+        """Muestra la pantalla de derrota con un mensaje y reproduce un sonido."""
         self.audio.detener()
         self.audio.reproducir("BooBoo.mp3")
         overlay = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
@@ -118,6 +129,7 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
         sleep(4)
 
     def mostrar_victoria(self):
+        """Muestra la pantalla de victoria con un mensaje y reproduce un sonido."""
         self.audio.detener()
         self.audio.reproducir("Fnaf.mp3")
         overlay = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
@@ -128,9 +140,14 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
         sleep(4)
 
     def ejecutar(self):
+        """Ejecuta el bucle del microjuego y devuelve si ganó o perdió."""
         self.audio.reproducir(archivo=self.music_file, loop=True)
+        if Config.mostrar_ayuda:
+            self.mostrar_controles(self.screen, "Controles:\nVolar: Espacio")
+
         clock = pygame.time.Clock()
         victoria = False
+
         while self.running:
             self.screen.fill((135, 206, 250))
             for event in pygame.event.get():
@@ -146,6 +163,7 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
             self.bird_velocity += self.GRAVITY
             self.bird_y += self.bird_velocity
 
+            self.fondo.dibujar(self.screen)
             self._mover_tubos()
             self._dibujar_tubos()
 
@@ -159,8 +177,9 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
             self._actualizar_puntaje()
 
             font = pygame.font.Font(None, 36)
-            score_text = font.render(f"Puntaje: {self.score}/{self.tuberias_para_ganar}", True, (0, 0, 0))
-            self.screen.blit(score_text, (10, 10))
+            if not self.infinity:
+                score_text = font.render(f"Puntaje: {self.score}/{self.tuberias_para_ganar}", True, (0, 0, 0))
+                self.screen.blit(score_text, (10, 10))
 
             pygame.display.flip()
             clock.tick(60)

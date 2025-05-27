@@ -1,5 +1,4 @@
 import pygame
-import globals_config as gc
 
 COLORS = {
     "WHITE": (255, 255, 255),
@@ -58,23 +57,14 @@ def draw_frame(screen, correction_x=0, correction_y=0):
 
 
 def fill_screen(screen, color):
+    """
+    Rellena la pantalla con un color especificado
+    :param screen:
+    :param color:
+    :return:
+    """
     screen.fill(COLORS[color])
 
-
-#TODO implementar menu de pausa junto a la funcion de cerrar el juego
-#     la estructura de implementacion en los minijuegos es la siguiente:
-
-'''
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-           pause_menu()
-           
-    Se debe incluir dentro de cada bucle
-'''
-
-
-def pause_menu():
-    return None  #Rellenar
 
 
 def show_text(screen, texto, size=36, justificacion='MIDDLE', color=(0, 0, 0), edge=False):
@@ -112,7 +102,7 @@ def show_text(screen, texto, size=36, justificacion='MIDDLE', color=(0, 0, 0), e
         screen.blit(texto_renderizado, (x_pos, y_pos + i * fuente.get_height()))  # Dibujar la línea
 
 
-def inner_time_safe_life(screen, time):
+def inner_time_safe_life(screen, time, LIVES, TOTAL_LIVES=3):
     """
     Pantalla entre microjuegos
 
@@ -120,10 +110,10 @@ def inner_time_safe_life(screen, time):
     """
     total_lives = ""
     limit = time + 1
-    for i in range(gc.LIVES):
+    for i in range(LIVES):
         total_lives += " [V] "
 
-    for i in range(gc.TOTAL_LIVES - gc.LIVES):
+    for i in range(TOTAL_LIVES - LIVES):
         total_lives += " [X] "
 
     start_time = pygame.time.get_ticks()

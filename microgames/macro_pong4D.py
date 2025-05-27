@@ -5,6 +5,7 @@ from core.gestor_audio import Audio
 
 
 class Pong4D(MicrojuegoBase):
+    """Microjuego de Pong 4D, una versión del clásico Pong con dos palas y una bola que rebota."""
     def __init__(self, time, screen, dificultad):
         super().__init__(screen, 400, dificultad=dificultad)
 
@@ -46,16 +47,19 @@ class Pong4D(MicrojuegoBase):
         self.paddle_left.focus_force()
 
     def _on_key_press(self, event):
+        """Maneja los eventos de pulsación de teclas para mover la pala izquierda."""
         if event.keysym == 'w':
             self.paddle_left_moving = -1
         elif event.keysym == 's':
             self.paddle_left_moving = 1
 
     def _on_key_release(self, event):
+        """Maneja los eventos de liberación de teclas para detener el movimiento de la pala izquierda."""
         if event.keysym in ('w', 's'):
             self.paddle_left_moving = 0
 
     def move_paddle(self):
+        """Mueve la pala izquierda según la tecla presionada."""
         if self.paddle_left_moving == -1 and self.paddle_left_y > 0:
             self.paddle_left_y -= self.PADDLE_SPEED
         elif self.paddle_left_moving == 1 and self.paddle_left_y < self.SCREEN_HEIGHT - self.PADDLE_HEIGHT:
@@ -65,6 +69,7 @@ class Pong4D(MicrojuegoBase):
         self.paddle_left.after(self.FRAME_RATE, self.move_paddle)
 
     def _crear_ventanas(self):
+        """Crea las ventanas necesarias para el microjuego."""
         self.ball = tk.Toplevel()
         self.ball.geometry(f"{self.BALL_SIZE}x{self.BALL_SIZE}+{self.SCREEN_WIDTH // 2}+{self.SCREEN_HEIGHT // 2}")
         self.ball.overrideredirect(True)
@@ -89,6 +94,7 @@ class Pong4D(MicrojuegoBase):
         self.score_label.pack(expand=True)
 
     def move_ball(self):
+        """Mueve la bola y maneja las colisiones con las paredes y las palas."""
         x, y = map(int, self.ball.geometry().split('+')[1:])
         x_new, y_new = int(x + self.ball_dx), int(y + self.ball_dy)
 
@@ -138,6 +144,7 @@ class Pong4D(MicrojuegoBase):
         self.ball.after(self.FRAME_RATE, self.move_ball)
 
     def _mostrar_mensaje_victoria(self):
+        """Muestra un mensaje de victoria en una ventana emergente."""
         ventana_victoria = tk.Toplevel()
         ventana_victoria.geometry(f"400x200+{self.SCREEN_WIDTH // 2 - 200}+{self.SCREEN_HEIGHT // 2 - 100}")
         ventana_victoria.overrideredirect(True)
@@ -146,6 +153,7 @@ class Pong4D(MicrojuegoBase):
         mensaje.pack(expand=True)
 
         def cerrar_todo():
+            """Cierra todas las ventanas y finaliza el microjuego."""
             ventana_victoria.destroy()
             self.ball.destroy()
             self.paddle_left.destroy()
@@ -156,6 +164,7 @@ class Pong4D(MicrojuegoBase):
         ventana_victoria.after(3000, cerrar_todo)
 
     def _mostrar_mensaje_derrota(self):
+        """Muestra un mensaje de derrota en una ventana emergente."""
         ventana_derrota = tk.Toplevel()
         ventana_derrota.geometry(f"400x200+{self.SCREEN_WIDTH // 2 - 200}+{self.SCREEN_HEIGHT // 2 - 100}")
         ventana_derrota.overrideredirect(True)
@@ -164,6 +173,7 @@ class Pong4D(MicrojuegoBase):
         mensaje.pack(expand=True)
 
     def move_bot(self):
+        """Mueve la pala derecha (bot) para seguir la bola."""
         _, ball_y = map(int, self.ball.geometry().split('+')[1:])
         center_y = self.paddle_right_y + self.PADDLE_HEIGHT // 2
 
@@ -185,6 +195,7 @@ class Pong4D(MicrojuegoBase):
         self.paddle_right.after(self.FRAME_RATE, self.move_bot)
 
     def inicio_piringolo(self):
+        """Inicializa el microjuego y muestra un mensaje de inicio."""
         self.paddle_left.withdraw()
         self.paddle_right.withdraw()
         self.score_window.withdraw()
@@ -196,6 +207,7 @@ class Pong4D(MicrojuegoBase):
         self.tk_root.after(6000, lambda: self.ball.deiconify())
 
         def mostrar_mensaje():
+            """Muestra un mensaje de inicio del juego."""
             ventana_mensaje = tk.Toplevel()
             ventana_mensaje.geometry(f"400x200+{self.SCREEN_WIDTH // 2 - 200}+{self.SCREEN_HEIGHT // 2 - 100}")
             ventana_mensaje.overrideredirect(True)
@@ -208,6 +220,7 @@ class Pong4D(MicrojuegoBase):
         self.tk_root.after(8000, mostrar_mensaje)
 
     def ejecutar(self):
+        """Ejecuta el microjuego y maneja la lógica del juego."""
         self.audio.reproducir(archivo=self.music_file, loop=True)
         self.inicio_piringolo()
         self.tk_root.after(10000, self.move_paddle)
