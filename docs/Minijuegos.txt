@@ -1,0 +1,75 @@
+Minijuego 1
+Hackeo de GTA de las letras - Pulsar a tiempo varias veces
+	- Solo letras
+	- Algunas rojas
+	- Cantidad x de palabras al azar
+
+Minijuego 2
+FIFTY SECONDS!!! - Pulsar muchas veces
+	- Carretilla quitando el oro
+	- Personaje animación idle
+	- Iniciar animación de cuando roba
+	- Bolsa de oro
+
+Minijuego 3
+Explotar burbujas - Haz a hank feliz
+	- El fondo
+	- Diseño de las burbujas
+
+Minijuego 4
+Diana
+	- Diana
+	- Arco
+
+Minijuego 5
+Duelo vaquero - Pulsar a tiempo
+	- Vaqueros 1 y 2 ( Lucky luck y sombra )
+	- Vaquero 1 y 2 sin pantalones
+	- fondo	
+
+Minijuego 6
+equilibrio ( Posible nuevo juego )
+
+
+Minijuego 7
+Snake
+	- Pensar comedia
+
+Minijuego 8
+Friday night funkin - Remember
+	- 5 posiciones personaje 1 y 2 ( Jaime y yo con filtro )
+	- fondo
+
+Minijuego 9
+Coger el teléfono - Pulsar a tiempo
+	- Mano
+	- Teléfono
+	- Your phone ringin / Barbie phone / Tintirintirin
+	
+
+Minijuego 10
+Submarino - Flappy bird 
+
+
+Minijuego 11
+Algebrea - Dibujar en pantalla
+	- Papel
+	- Aprobado / Suspenso
+	- Silueta (posible)
+
+Minijuego 12 - 13
+Funa en Twitter / Programame
+	- Twitter
+	- Pycharm
+
+
+Juego 
+Escapa de la UJA - Laberinto
+
+Macrogame 1
+Pong 4D
+	- Buscar sprytes
+
+Macrogame 2
+Samurai
+	- Se encarga jaime
