@@ -3,11 +3,13 @@ import random
 from microgames.microgame_base import MicrojuegoBase
 from core.gestor_sprites import Sprite
 from core.config import Config
+from core.utils import ruta_recurso
 
 class MicrojuegoDispararFlecha(MicrojuegoBase):
     def __init__(self, screen, tiempo, dificultad=1):
         super().__init__(screen, tiempo, dificultad)
         self.musica = "Bananza.mp3"  # Música del minijuego
+        self.win = False  # Indica si el jugador ha ganado
 
         # Tamaños de la diana y la flecha
         self.tam_diana = 120
@@ -15,8 +17,8 @@ class MicrojuegoDispararFlecha(MicrojuegoBase):
         self.tam_flecha_y = 60
 
         # Crear sprites con los tamaños ajustables
-        self.diana = Sprite("../assets/microgames/diana/diana.png", self.tam_diana, self.tam_diana)
-        self.flecha = Sprite("../assets/microgames/diana/bala.png", self.tam_flecha_x, self.tam_flecha_y)
+        self.diana = Sprite(ruta_recurso("assets/microgames/diana/diana.png"), self.tam_diana, self.tam_diana)
+        self.flecha = Sprite(ruta_recurso("assets/microgames/diana/bala.png"), self.tam_flecha_x, self.tam_flecha_y)
 
         # Velocidades
         self.velocidad_diana = 5
@@ -31,7 +33,7 @@ class MicrojuegoDispararFlecha(MicrojuegoBase):
         self.flecha.actualizar_posicion(screen.get_width() // 2, screen.get_height() - 100)
 
         # Fondo
-        self.fondo = Sprite("../assets/microgames/diana/Bananzafondo.png", screen.get_width(), screen.get_height())
+        self.fondo = Sprite(ruta_recurso("assets/microgames/diana/Bananzafondo.png"), screen.get_width(), screen.get_height())
 
     def manejar_eventos(self, event):
         """Detecta si el jugador presionó espacio o hizo clic para disparar"""
@@ -76,16 +78,17 @@ class MicrojuegoDispararFlecha(MicrojuegoBase):
 
     def dibujar(self):
         """Dibuja la diana y la flecha en pantalla"""
-        self.screen.fill((255, 255, 255))  # Fondo blanco
-        self.fondo.dibujar(self.screen)  # Dibuja el fondo del escritorio
+        self.screen.fill((255, 255, 255))
+        self.fondo.dibujar(self.screen)
         self.diana.dibujar(self.screen)
         self.flecha.dibujar(self.screen)
 
 
-    # Mostrar mensaje de victoria si el jugador acierta
+    # Mostrar mensaje de victoria
         if self.juego_ganado:
             font = pygame.font.Font(None, 60)
             texto = font.render("¡Has acertado!", True, (0, 255, 0))
+            self.win = True  # Marcar como ganado
             self.screen.blit(texto, (self.screen.get_width() // 3, self.screen.get_height() // 2))
 
         pygame.display.flip()
@@ -100,22 +103,21 @@ class MicrojuegoDispararFlecha(MicrojuegoBase):
         inicio = pygame.time.get_ticks()
 
         while True:
-            self.screen.fill((0, 0, 0))  # Fondo negro
+            self.screen.fill((0, 0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     return False
                 resultado = self.manejar_eventos(event)
                 if resultado == "exit_to_menu":
-                    return "exit_to_menu"  # o la lógica que haga volver al menú
+                    return "exit_to_menu"
 
             self.actualizar()
             self.dibujar()
             pygame.display.flip()
 
-            # Verifica si se acabó el tiempo
             if (pygame.time.get_ticks() - inicio) / 1000 > self.tiempo_limite:
-                return self.win  # Minijuego perdido
                 self.audio.detener()
+                return self.win
 
             reloj.tick(30)

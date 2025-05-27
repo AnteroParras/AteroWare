@@ -5,6 +5,7 @@ from microgames.microgame_base import MicrojuegoBase
 from core.gestor_audio import Audio
 from core.gestor_sprites import Sprite
 from core.config import Config
+from core.utils import ruta_recurso
 
 class MicrojuegoFlappyBird(MicrojuegoBase):
     """Microjuego inspirado en Flappy Bird, donde el jugador controla un pájaro que debe evitar obstáculos."""
@@ -35,14 +36,14 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
             else:
                 self.tuberias_para_ganar = 12
 
-        self.bird_sprite = Sprite("../assets/microgames/gato_enfadao.jpg", self.BIRD_SIZE, self.BIRD_SIZE)
-        self.pipe_sprite = Sprite("../assets/microgames/pollovolador/entubados.png", self.PIPE_WIDTH, self.SCREEN_HEIGHT)
-        self.fondo = Sprite("../assets/microgames/pollovolador/PolloFondo.png", screen.get_width(), screen.get_height())
+        self.bird_sprite = Sprite(ruta_recurso("assets/microgames/gato_enfadao.jpg"), self.BIRD_SIZE, self.BIRD_SIZE)
+        self.pipe_sprite = Sprite(ruta_recurso("assets/microgames/pollovolador/entubados.png"), self.PIPE_WIDTH, self.SCREEN_HEIGHT)
+        self.fondo = Sprite(ruta_recurso("assets/microgames/pollovolador/PolloFondo.png"), screen.get_width(), screen.get_height())
 
 
         # Cargar imágenes de victoria y derrota
-        self.imagen_victoria = pygame.image.load("../assets/microgames/pollovolador/angry_win.jpg").convert_alpha()
-        self.imagen_derrota = pygame.image.load("../assets/microgames/pollovolador/angry_lose.jpg").convert_alpha()
+        self.imagen_victoria = pygame.image.load(ruta_recurso("assets/microgames/pollovolador/angry_win.jpg")).convert_alpha()
+        self.imagen_derrota = pygame.image.load(ruta_recurso("assets/microgames/pollovolador/angry_lose.jpg")).convert_alpha()
         self.imagen_victoria_rect = self.imagen_victoria.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT // 2))
         self.imagen_derrota_rect = self.imagen_derrota.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT // 2))
 
@@ -60,7 +61,7 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
             if event.key == pygame.K_ESCAPE:
                 accion = self.menu.mostrar_pausa(self.screen)
                 if accion == "continue":
-                    pass  # Salir del menú de pausa y continuar
+                    pass
                 elif accion == "options":
                     self.menu.mostrar_opciones(self.screen)
                 elif accion == "exit":
@@ -143,7 +144,7 @@ class MicrojuegoFlappyBird(MicrojuegoBase):
         """Ejecuta el bucle del microjuego y devuelve si ganó o perdió."""
         self.audio.reproducir(archivo=self.music_file, loop=True)
         if Config.mostrar_ayuda:
-            self.mostrar_controles(self.screen, "Controles:\nVolar: Espacio")
+            self.mostrar_controles(self.screen, "\nVolar: Espacio")
 
         clock = pygame.time.Clock()
         victoria = False

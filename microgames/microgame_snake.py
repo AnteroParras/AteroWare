@@ -7,6 +7,8 @@ from microgames.microgame_base import MicrojuegoBase
 from core.gestor_sprites import Sprite
 from core.gestor_audio import Audio
 from core.config import Config
+from core.utils import ruta_recurso
+
 
 class SnakeGame(MicrojuegoBase):
     """Microjuego de la serpiente"""
@@ -40,45 +42,45 @@ class SnakeGame(MicrojuegoBase):
 
         # Sprites
         self.sprites_serpiente = {
-            "cabeza_derecha": Sprite("../assets/microgames/Solid/head_right.png", self.tamano_celda_ancho,
+            "cabeza_derecha": Sprite(ruta_recurso("assets/microgames/Solid/head_right.png"), self.tamano_celda_ancho,
                                      self.tamano_celda_alto),
-            "cabeza_izquierda": Sprite("../assets/microgames/Solid/head_left.png", self.tamano_celda_ancho,
+            "cabeza_izquierda": Sprite(ruta_recurso("assets/microgames/Solid/head_left.png"), self.tamano_celda_ancho,
                                        self.tamano_celda_alto),
-            "cabeza_arriba": Sprite("../assets/microgames/Solid/head_up.png", self.tamano_celda_ancho,
+            "cabeza_arriba": Sprite(ruta_recurso("assets/microgames/Solid/head_up.png"), self.tamano_celda_ancho,
                                     self.tamano_celda_alto),
-            "cabeza_abajo": Sprite("../assets/microgames/Solid/head_down.png", self.tamano_celda_ancho,
+            "cabeza_abajo": Sprite(ruta_recurso("assets/microgames/Solid/head_down.png"), self.tamano_celda_ancho,
                                    self.tamano_celda_alto),
-            "cuerpo_horizontal": Sprite("../assets/microgames/Solid/body_horizontal.png", self.tamano_celda_ancho,
+            "cuerpo_horizontal": Sprite(ruta_recurso("assets/microgames/Solid/body_horizontal.png"), self.tamano_celda_ancho,
                                         self.tamano_celda_alto),
-            "cuerpo_vertical": Sprite("../assets/microgames/Solid/body_vertical.png", self.tamano_celda_ancho,
+            "cuerpo_vertical": Sprite(ruta_recurso("assets/microgames/Solid/body_vertical.png"), self.tamano_celda_ancho,
                                       self.tamano_celda_alto),
-            "curva1": Sprite("../assets/microgames/Solid/body_bottomleft.png", self.tamano_celda_ancho,
+            "curva1": Sprite(ruta_recurso("assets/microgames/Solid/body_bottomleft.png"), self.tamano_celda_ancho,
                              self.tamano_celda_alto),
-            "curva2": Sprite("../assets/microgames/Solid/body_topleft.png", self.tamano_celda_ancho,
+            "curva2": Sprite(ruta_recurso("assets/microgames/Solid/body_topleft.png"), self.tamano_celda_ancho,
                              self.tamano_celda_alto),
-            "curva3": Sprite("../assets/microgames/Solid/body_topright.png", self.tamano_celda_ancho,
+            "curva3": Sprite(ruta_recurso("assets/microgames/Solid/body_topright.png"), self.tamano_celda_ancho,
                              self.tamano_celda_alto),
-            "curva4": Sprite("../assets/microgames/Solid/body_bottomright.png", self.tamano_celda_ancho,
+            "curva4": Sprite(ruta_recurso("assets/microgames/Solid/body_bottomright.png"), self.tamano_celda_ancho,
                              self.tamano_celda_alto),
-            "cola_derecha": Sprite("../assets/microgames/Solid/tail_left.png", self.tamano_celda_ancho,
+            "cola_derecha": Sprite(ruta_recurso("assets/microgames/Solid/tail_left.png"), self.tamano_celda_ancho,
                                    self.tamano_celda_alto),
-            "cola_izquierda": Sprite("../assets/microgames/Solid/tail_right.png", self.tamano_celda_ancho,
+            "cola_izquierda": Sprite(ruta_recurso("assets/microgames/Solid/tail_right.png"), self.tamano_celda_ancho,
                                      self.tamano_celda_alto),
-            "cola_arriba": Sprite("../assets/microgames/Solid/tail_down.png", self.tamano_celda_ancho,
+            "cola_arriba": Sprite(ruta_recurso("assets/microgames/Solid/tail_down.png"), self.tamano_celda_ancho,
                                   self.tamano_celda_alto),
-            "cola_abajo": Sprite("../assets/microgames/Solid/tail_up.png", self.tamano_celda_ancho,
+            "cola_abajo": Sprite(ruta_recurso("assets/microgames/Solid/tail_up.png"), self.tamano_celda_ancho,
                                  self.tamano_celda_alto)
         }
 
-        self.imagen_derrota = pygame.image.load("../assets/microgames/Solid/lose.png").convert_alpha()
+        self.imagen_derrota = pygame.image.load(ruta_recurso("assets/microgames/Solid/lose.png")).convert_alpha()
         self.imagen_derrota_rect = self.imagen_derrota.get_rect(
             center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
 
-        self.imagen_victoria = pygame.image.load("../assets/microgames/Solid/win.png").convert_alpha()
+        self.imagen_victoria = pygame.image.load(ruta_recurso("assets/microgames/Solid/win.png")).convert_alpha()
         self.imagen_victoria_rect = self.imagen_derrota.get_rect(
             center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
 
-        # Inicialización serpiente en la parte superior izquierda
+        # Inicialización serpiente
         self.snake = [
             (self.margen + self.tamano_celda_ancho * 3, self.margen + self.tamano_celda_alto * 5),
             (self.margen + self.tamano_celda_ancho * 2, self.margen + self.tamano_celda_alto * 5),
@@ -86,7 +88,7 @@ class SnakeGame(MicrojuegoBase):
         ]
 
         self.food = self.generar_comida()
-        self.food_sprite = Sprite("../assets/microgames/Solid/apple.png", self.tamano_celda_ancho,
+        self.food_sprite = Sprite(ruta_recurso("assets/microgames/Solid/apple.png"), self.tamano_celda_ancho,
                                   self.tamano_celda_alto)
 
         self.remaining_food = 321 if infinity else (2 + self.dificultad)
@@ -114,13 +116,10 @@ class SnakeGame(MicrojuegoBase):
             elif event.key == pygame.K_ESCAPE:
                 accion = self.menu.mostrar_pausa(self.screen)
                 if accion == "continue":
-                    # simplemente salimos del menú de pausa
                     pass
                 elif accion == "options":
                     self.menu.mostrar_opciones(self.screen)
-                    # al cerrar opciones volverá aquí y saldrá de pausa
                 elif accion == "exit":
-                    # retornamos una señal para que el bucle superior maneje la salida
                     return "exit_to_menu"
 
     def actualizar(self):
@@ -225,13 +224,13 @@ class SnakeGame(MicrojuegoBase):
                     sprite = self.sprites_serpiente["cuerpo_horizontal"]
                 else:
                     if (dx1 < 0 and dy2 < 0) or (dy1 < 0 and dx2 < 0):
-                        sprite = self.sprites_serpiente["curva1"]  # ↖
+                        sprite = self.sprites_serpiente["curva1"]
                     elif (dx1 > 0 > dy2) or (dy1 < 0 < dx2):
-                        sprite = self.sprites_serpiente["curva2"]  # ↗
+                        sprite = self.sprites_serpiente["curva2"]
                     elif (dx1 > 0 and dy2 > 0) or (dy1 > 0 and dx2 > 0):
-                        sprite = self.sprites_serpiente["curva3"]  # ↘
+                        sprite = self.sprites_serpiente["curva3"]
                     elif (dx1 < 0 < dy2) or (dy1 > 0 > dx2):
-                        sprite = self.sprites_serpiente["curva4"]  # ↙
+                        sprite = self.sprites_serpiente["curva4"]
 
             sprite.actualizar_posicion(x, y)
             sprite.dibujar(self.screen)
@@ -245,7 +244,7 @@ class SnakeGame(MicrojuegoBase):
         self.audio.reproducir("BooBoo.mp3")
 
         overlay = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 150))  # Negro con 150 de opacidad
+        overlay.fill((0, 0, 0, 150))
 
         # Dibujar la superposición en la pantalla
         self.screen.blit(overlay, (0, 0))
@@ -265,7 +264,7 @@ class SnakeGame(MicrojuegoBase):
         self.remaining_food -= 1
 
         overlay = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 150))  # Negro con 150 de opacidad
+        overlay.fill((0, 0, 0, 150))
 
         # Dibujar la superposición en la pantalla
         self.screen.blit(overlay, (0, 0))
@@ -280,11 +279,10 @@ class SnakeGame(MicrojuegoBase):
     def ejecutar(self):
         self.audio.reproducir("Snake.mp3")
         if Config.mostrar_ayuda:
-            self.mostrar_controles(self.screen, "Controles:\nFlechas direccionales/WASD para mover a la serpiente")
+            self.mostrar_controles(self.screen, "\nFlechas direccionales/WASD para mover a la serpiente")
 
         reloj = pygame.time.Clock()
         inicio = pygame.time.get_ticks()
-
 
         while True:
             if self.win:

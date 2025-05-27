@@ -4,11 +4,14 @@ from src.layout import draw_frame, show_text
 from microgames.microgame_base import MicrojuegoBase
 from core.gestor_sprites import Sprite
 from core.config import Config
+from core.utils import ruta_recurso
+
 
 class MicrojuegoExplotarBurbujas(MicrojuegoBase):
+    """Microjuego donde el jugador debe hacer clic en hanks tristes para hacerlas felices."""
     def __init__(self, screen, time, dificultad=1):
         super().__init__(screen, time, dificultad=dificultad)
-        # self.musica = "A1.mp3"  # Música del minijuego
+
         self.desfase = 40
         self.clicked_targets = set()
         self.num_x = (self.screen.get_width() - self.desfase * 2) // 8  # Ancho de burbujas
@@ -36,9 +39,9 @@ class MicrojuegoExplotarBurbujas(MicrojuegoBase):
 
         for i, (x, y) in enumerate(self.targets):
             if i in self.selected_targets:
-                bubble = Sprite("../assets/microgames/explotar_burbujas/bad.png", self.num_x, self.num_y)
+                bubble = Sprite(ruta_recurso("assets/microgames/explotar_burbujas/bad.png"), self.num_x, self.num_y)
             else:
-                bubble = Sprite("../assets/microgames/explotar_burbujas/good.png", self.num_x, self.num_y)
+                bubble = Sprite(ruta_recurso("assets/microgames/explotar_burbujas/good.png"), self.num_x, self.num_y)
 
             bubble.actualizar_posicion(x - self.num_x // 2, y - self.num_y // 2)
             self.bubbles.add(bubble)
@@ -51,10 +54,11 @@ class MicrojuegoExplotarBurbujas(MicrojuegoBase):
                 if i in self.selected_targets and (mx - x) ** 2 + (my - y) ** 2 <= self.radius ** 2:
                     self.clicked_targets.add(i)
                     self.selected_targets.remove(i)
+
                     # Cambiar la imagen de la burbuja explotada
                     for bubble in self.bubbles:
                         if bubble.rect.collidepoint(mx, my):
-                            bubble.image = pygame.image.load("../assets/microgames/explotar_burbujas/good.png")
+                            bubble.image = pygame.image.load(ruta_recurso("assets/microgames/explotar_burbujas/good.png"))
                             bubble.image = pygame.transform.scale(bubble.image, (self.num_x, self.num_y))
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -76,7 +80,7 @@ class MicrojuegoExplotarBurbujas(MicrojuegoBase):
 
     def dibujar(self):
         """Dibuja los sprites en pantalla"""
-        self.screen.fill((255, 255, 255))  # Fondo blanco
+        self.screen.fill((255, 255, 255))
         draw_frame(self.screen)
         self.bubbles.draw(self.screen)
 
@@ -96,14 +100,14 @@ class MicrojuegoExplotarBurbujas(MicrojuegoBase):
         inicio = pygame.time.get_ticks()
 
         while True:
-            self.screen.fill((0, 0, 0))  # Fondo negro
+            self.screen.fill((0, 0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     return False
                 resultado = self.manejar_eventos(event)
                 if resultado == "exit_to_menu":
-                    return "exit_to_menu"  # o la lógica que haga volver al menú
+                    return "exit_to_menu"  # volver al menú
 
             self.actualizar()
             self.dibujar()
