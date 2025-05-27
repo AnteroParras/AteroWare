@@ -7,12 +7,13 @@ from microgames.microgame_snake import SnakeGame
 from microgames.macro_pong4D import Pong4D
 from core.gestor_audio import Audio
 from microgames.microgame_tetris import Tetris
+from microgames.microgame_pollovolador import MicrojuegoFlappyBird
 
 
 class GameManager:
     def __init__(self, screen):
         self.screen = screen
-        self.minijuegos = []  # Lista de clases de minijuegos
+        self.minijuegos = [MicrojuegoFlappyBird, SnakeGame, MicrojuegoExplotarBurbujas, Tetris]  # Lista de clases de minijuegos
         self.indice = 0  # Lleva el progreso
         self.dificultad = 1
         self.macro_win = False
@@ -23,7 +24,7 @@ class GameManager:
     def ejecutar_microjuego(self, time):
         resultado = False
 
-        if self.indice >= len(self.minijuegos):
+        if self.indice >= len(self.minijuegos) :
             self.epic_final_intro()
             macrojuego = Pong4D(self.screen, time, self.dificultad)
             self.macro_win = macrojuego.ejecutar()

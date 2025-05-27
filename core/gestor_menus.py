@@ -36,9 +36,9 @@ class Menu:
 
     def mostrar_opciones(self, screen):
         """Muestra la pantalla de opciones con animación de bamboleo en el texto y un botón para volver al menú principal."""
-        fondo_gif = GIFSprite("Menu.gif", screen.get_width(), screen.get_height())
+        fondo_gif = GIFSprite("../assets/menu/menu.gif", screen.get_width(), screen.get_height())
         font = pygame.font.Font(None, 50)
-        texto_opciones = "Menú de opciones (por implementar, tened paciencia 👉👈)"
+        texto_opciones = "Ta difisil implementarlo ahora, sorry :( "
         lineas_texto = self.dividir_texto(texto_opciones, font, screen.get_width() - 40)
 
         boton_atras = {"texto": "Atrás", "rect": None, "angulo": 0}
@@ -85,7 +85,7 @@ class Menu:
 
     def mostrar_creditos(self, screen):
         """Muestra la pantalla de créditos con animación de bamboleo en el texto y un botón para volver al menú principal."""
-        fondo_gif = GIFSprite("Menu.gif", screen.get_width(), screen.get_height())
+        fondo_gif = GIFSprite("../assets/menu/menu.gif", screen.get_width(), screen.get_height())
         font = pygame.font.Font(None, 50)
         texto_creditos = "Trabajo hecho por Antero y Alejandro UwU"
         lineas_texto = self.dividir_texto(texto_creditos, font, screen.get_width() - 40)
@@ -273,6 +273,7 @@ class Menu:
             from microgames.microgame_hankujas import MicrojuegoExplotarBurbujas
             from microgames.microgame_snake import SnakeGame
             from microgames.microgame_tetris import Tetris
+            from microgames.microgame_pollovolador import MicrojuegoFlappyBird
 
             # Definimos las tres pestañas y sus juegos
             categorias = [
@@ -287,6 +288,8 @@ class Menu:
                      "imagen": "../assets/thumbnails/snake_title_2.png"},
                     {"nombre": "Tetris", "clase": Tetris,
                      "imagen": "../assets/thumbnails/tetris_title.jpg"},
+                    {"nombre": "Pollovolador", "clase": MicrojuegoFlappyBird,
+                     "imagen": "../assets/thumbnails/flappy_title.jpg"},
                 ]},
                 {"nombre": "Macrojuegos", "lista": [
                     {"nombre": "Pong4D", "clase": Pong4D, "imagen": "../assets/thumbnails/pong4d_title.jpg"},
@@ -294,6 +297,7 @@ class Menu:
                 {"nombre": "Juegos especiales", "lista": [
                     {"nombre": "Snake clasico", "clase": SnakeGame, "imagen": "../assets/thumbnails/snake_title_2.png"},
                     {"nombre": "Tetris clasico", "clase": Tetris, "imagen": "../assets/thumbnails/tetris_title.jpg"},
+                    {"nombre": "Flappy Bird infinito", "clase": MicrojuegoFlappyBird, "imagen": "../assets/thumbnails/flappy_title.jpg"},
                 ]},
             ]
 
@@ -353,6 +357,9 @@ class Menu:
                         orig = mj["clase"]
                         mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
                     if categorias[active_tab]["nombre"] == "Juegos especiales" and mj["nombre"] == "Tetris clasico":
+                        orig = mj["clase"]
+                        mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
+                    if categorias[active_tab]["nombre"] == "Juegos especiales" and mj["nombre"] == "Flappy Bird infinito":
                         orig = mj["clase"]
                         mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
                     else:
