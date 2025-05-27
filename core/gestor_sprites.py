@@ -1,5 +1,6 @@
 import pygame
 from PIL import Image, ImageSequence
+from core.utils import ruta_recurso
 
 
 class Sprite(pygame.sprite.Sprite):

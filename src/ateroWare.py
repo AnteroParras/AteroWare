@@ -4,7 +4,7 @@ from core.gestor_audio import Audio
 from core.gestor_microgames import GameManager
 from core.gestor_menus import Menu
 
-from layout import inner_time_safe_life, fill_screen
+from src.layout import inner_time_safe_life, fill_screen
 
 
 # Inicialización de pygame y variables

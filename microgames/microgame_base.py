@@ -44,7 +44,7 @@ class MicrojuegoBase:
         inicio = pygame.time.get_ticks()
 
         while True:
-            self.screen.fill((0, 0, 0))  # Fondo negro
+            self.screen.fill((0, 0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()

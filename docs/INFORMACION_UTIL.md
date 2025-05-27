@@ -27,4 +27,4 @@ Si quieres comportamientos distintos hay que sobreescribir el metodo ejecutar en
 
 
 ### SFX
-Si se quiere incluir efectos de sonido hay que utilizar pygame.mixer.sound.
+Si se quiere incluir efectos de sonido hay que utilizar pygame.mixer.sound

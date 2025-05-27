@@ -9,12 +9,15 @@ class Pong4D(MicrojuegoBase):
     def __init__(self, time, screen, dificultad):
         super().__init__(screen, 400, dificultad=dificultad)
 
+        # Inicializar el gestor de audio y la música del microjuego
         self.audio = Audio()
         self.music_file = "FinalBoss.mp3"
 
+        # Inicializar la ventana de tkinter
         self.tk_root = tk.Tk()
         self.tk_root.withdraw()
 
+        # Configuración de la pantalla y dimensiones del microjuego
         self.SCREEN_WIDTH = self.tk_root.winfo_screenwidth()
         self.SCREEN_HEIGHT = self.tk_root.winfo_screenheight()
         self.BALL_SIZE = 50
@@ -32,16 +35,20 @@ class Pong4D(MicrojuegoBase):
 
         self._crear_ventanas()
 
+        # Inicializar la bola y las palas
         self.ball_dx, self.ball_dy = random.choice([-self.BALL_SPEED, self.BALL_SPEED]), random.choice(
             [-self.BALL_SPEED, self.BALL_SPEED])
         self.paddle_left_y = self.SCREEN_HEIGHT // 2 - 50
         self.paddle_right_y = self.SCREEN_HEIGHT // 2 - 50
         self.paddle_left_moving = 0
 
+        # Score_left : jugador
+        # Score_right : bot
         self.score_left = 0
         self.score_right = 0
         self.win = False
 
+        # Configurar la pala izquierda para recibir eventos de teclado
         self.paddle_left.bind('<KeyPress>', self._on_key_press)
         self.paddle_left.bind('<KeyRelease>', self._on_key_release)
         self.paddle_left.focus_force()
@@ -128,7 +135,7 @@ class Pong4D(MicrojuegoBase):
 
         self.score_label.config(text=f"{self.score_left} - {self.score_right}")
 
-        if self.score_left == 1:
+        if self.score_left == 5:
             self.win = True
             self._mostrar_mensaje_victoria()
             self.tk_root.after(3000, self.tk_root.quit)
