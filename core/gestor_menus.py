@@ -1,9 +1,11 @@
 import pygame
 from math import sin, radians
+import sys
 
 from core.gestor_audio import Audio
 from core.gestor_sprites import GIFSprite
-
+from core.config import Config  # Asegúrate de tener la clase Config como en la respuesta anterior
+from core.utils import ruta_recurso
 
 
 class Menu:
@@ -35,35 +37,45 @@ class Menu:
         return lineas
 
     def mostrar_opciones(self, screen):
-        """Muestra la pantalla de opciones con animación de bamboleo en el texto y un botón para volver al menú principal."""
-        fondo_gif = GIFSprite("../assets/menu/menu.gif", screen.get_width(), screen.get_height())
+        fondo_gif = GIFSprite(ruta_recurso(ruta_recurso("assets/menu/menu.gif")), screen.get_width(), screen.get_height())
         font = pygame.font.Font(None, 50)
-        texto_opciones = "Ta difisil implementarlo ahora, sorry :( "
+        texto_opciones = "Opciones"
         lineas_texto = self.dividir_texto(texto_opciones, font, screen.get_width() - 40)
 
+        # Botón ayuda ON/OFF
+        ayuda_rect = pygame.Rect(screen.get_width() // 2 - 100, 250, 200, 60)
+
+        # Botón atrás
         boton_atras = {"texto": "Atrás", "rect": None, "angulo": 0}
         boton_atras["superficie"] = font.render(boton_atras["texto"], True, (255, 255, 255))
         boton_atras["rect"] = boton_atras["superficie"].get_rect(
             center=(screen.get_width() // 2, screen.get_height() - 100))
 
-        angulo_incremento = 1.5  # Velocidad de rotación
+        angulo_incremento = 1.5
         reloj = pygame.time.Clock()
 
         while True:
-            fondo_gif.update()  # Actualizar el fotograma del GIF
-            fondo_gif.dibujar(screen)  # Dibujar el GIF en la pantalla
+            fondo_gif.update()
+            fondo_gif.dibujar(screen)
 
-            # Dibujar texto dividido en líneas con animación de bamboleo
+            # Título con animación
             y_offset = 100
             for linea in lineas_texto:
                 superficie_texto = font.render(linea, True, (255, 255, 255))
                 superficie_rotada = pygame.transform.rotate(superficie_texto,
-                                                            sin(pygame.time.get_ticks() / 200) * 2)  # Cambia el ángulo de rotación, mas grande = mas angulo duh
+                                                            sin(pygame.time.get_ticks() / 200) * 2)
                 texto_rect = superficie_rotada.get_rect(center=(screen.get_width() // 2, y_offset))
                 screen.blit(superficie_rotada, texto_rect)
                 y_offset += 50
 
-            # Dibujar botón "Atrás" con animación de bamboleo
+            # Botón ayuda ON/OFF
+            color_ayuda = (0, 200, 0) if Config.mostrar_ayuda else (200, 0, 0)
+            pygame.draw.rect(screen, color_ayuda, ayuda_rect, border_radius=15)
+            texto_ayuda = "Ayuda: ON" if Config.mostrar_ayuda else "Ayuda: OFF"
+            surf_ayuda = font.render(texto_ayuda, True, (255, 255, 255))
+            screen.blit(surf_ayuda, surf_ayuda.get_rect(center=ayuda_rect.center))
+
+            # Botón atrás con animación
             boton_atras["angulo"] += angulo_incremento
             boton_atras["angulo"] %= 360
             superficie_rotada = pygame.transform.rotate(boton_atras["superficie"],
@@ -76,33 +88,44 @@ class Menu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if boton_atras["rect"].collidepoint(event.pos):
-                        return  # Volver al menú principal
+                    if ayuda_rect.collidepoint(event.pos):
+                        Config.mostrar_ayuda = not Config.mostrar_ayuda
+                    elif boton_atras["rect"].collidepoint(event.pos):
+                        return
 
             reloj.tick(60)
 
     def mostrar_creditos(self, screen):
-        """Muestra la pantalla de créditos con animación de bamboleo en el texto y un botón para volver al menú principal."""
-        fondo_gif = GIFSprite("../assets/menu/menu.gif", screen.get_width(), screen.get_height())
+        fondo_gif = GIFSprite(ruta_recurso("assets/menu/menu.gif"), screen.get_width(), screen.get_height())
         font = pygame.font.Font(None, 50)
+        font_nombre = pygame.font.Font(None, 44)
         texto_creditos = "Trabajo hecho por Antero y Alejandro UwU"
         lineas_texto = self.dividir_texto(texto_creditos, font, screen.get_width() - 40)
+
+        img1 = pygame.image.load(ruta_recurso("assets/menu/pacoFiestas.jpg")).convert_alpha()
+        img2 = pygame.image.load(ruta_recurso("assets/menu/jaime.jpg")).convert_alpha()
+        img1 = pygame.transform.scale(img1, (280, 280))
+        img2 = pygame.transform.scale(img2, (280, 280))
+
+        x1 = screen.get_width() // 2 - 180
+        x2 = screen.get_width() // 2 + 180
+        y_img = 320
 
         boton_atras = {"texto": "Atrás", "rect": None, "angulo": 0}
         boton_atras["superficie"] = font.render(boton_atras["texto"], True, (255, 255, 255))
         boton_atras["rect"] = boton_atras["superficie"].get_rect(
             center=(screen.get_width() // 2, screen.get_height() - 100))
 
-        angulo_incremento = 2  # Velocidad de rotación
+        angulo_incremento = 2
         reloj = pygame.time.Clock()
 
         while True:
-            fondo_gif.update()  # Actualizar el fotograma del GIF
-            fondo_gif.dibujar(screen)  # Dibujar el GIF en la pantalla
+            fondo_gif.update()
+            fondo_gif.dibujar(screen)
 
-            # Dibujar texto dividido en líneas con animación de bamboleo
+            # Texto con bamboleo
             y_offset = 100
             for linea in lineas_texto:
                 superficie_texto = font.render(linea, True, (255, 255, 255))
@@ -111,7 +134,45 @@ class Menu:
                 screen.blit(superficie_rotada, texto_rect)
                 y_offset += 50
 
-            # Dibujar botón "Atrás" con animación de bamboleo
+            t = pygame.time.get_ticks()
+            offset1 = int(20 * sin(t / 400))
+            offset2 = int(20 * sin(t / 400 + 2))
+
+            # Reborde arcoíris animado
+            for i, (x, offset) in enumerate([(x1, offset1), (x2, offset2)]):
+                color = (
+                    int(128 + 127 * sin(t / 300 + i)),
+                    int(128 + 127 * sin(t / 300 + 2 + i)),
+                    int(128 + 127 * sin(t / 300 + 4 + i))
+                )
+                rect = pygame.Rect(0, 0, 290, 290)
+                rect.center = (x, y_img + offset)
+                pygame.draw.rect(screen, color, rect, border_radius=30, width=8)
+
+            screen.blit(img1, img1.get_rect(center=(x1, y_img + offset1)))
+            screen.blit(img2, img2.get_rect(center=(x2, y_img + offset2)))
+
+            # Nombres con color animado
+            color1 = (
+                int(128 + 127 * sin(t / 400)),
+                int(128 + 127 * sin(t / 400 + 2)),
+                int(128 + 127 * sin(t / 400 + 4))
+            )
+            color2 = (
+                int(128 + 127 * sin(t / 400 + 1)),
+                int(128 + 127 * sin(t / 400 + 3)),
+                int(128 + 127 * sin(t / 400 + 5))
+            )
+            nombre1 = font_nombre.render("Antero", True, color1)
+            nombre2 = font_nombre.render("Alejandro", True, color2)
+            nombre1_rot = pygame.transform.rotate(nombre1, sin(t / 400) * 5)
+            nombre2_rot = pygame.transform.rotate(nombre2, sin(t / 400 + 2) * 5)
+            rect1 = nombre1_rot.get_rect(center=(x1, y_img + 160 + offset1))
+            rect2 = nombre2_rot.get_rect(center=(x2, y_img + 160 + offset2))
+            screen.blit(nombre1_rot, rect1)
+            screen.blit(nombre2_rot, rect2)
+
+            # Botón "Atrás" con animación
             boton_atras["angulo"] += angulo_incremento
             boton_atras["angulo"] %= 360
             superficie_rotada = pygame.transform.rotate(boton_atras["superficie"],
@@ -124,31 +185,26 @@ class Menu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if boton_atras["rect"].collidepoint(event.pos):
-                        return  # Volver al menú principal
+                        return
 
             reloj.tick(60)
 
+
     def mostrar_menu(self, screen):
         """Muestra el menú principal con animación de rotación en los botones y cambio de color en el título."""
-        # Cargar imagen de fondo
-        # fondo = pygame.image.load("../assets/microgames/explotar_burbujas/bad.png")
-        # fondo = pygame.transform.scale(fondo, (screen.get_width(), screen.get_height()))
-
         # Cargar GIF de fondo (Funciona, pero pilla el path de scr no se porqué)
-        fondo_gif = GIFSprite("../assets/menu/menu.gif", screen.get_width(), screen.get_height())
+        fondo_gif = GIFSprite(ruta_recurso("assets/menu/menu.gif"), screen.get_width(), screen.get_height())
 
         # Cargar fuente personalizada
-        fuente_personalizada = "../assets/fuentes/SuperMario256.ttf"  # Ruta al archivo de fuente
+        fuente_personalizada = ruta_recurso("assets/fuentes/SuperMario256.ttf")  # Ruta al archivo de fuente
         font_titulo = pygame.font.Font(fuente_personalizada, 100)  # Fuente para el título
         font_botones = pygame.font.Font(fuente_personalizada, 74)  # Fuente para los botones, por ahora no se usa
 
         # Configurar fuente y texto del título
-        # font_titulo = pygame.font.Font(None, 100)
         titulo_text = "AteroWare"
-        titulo_rect = None
 
         # Colores para el título
         colores = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
@@ -243,7 +299,7 @@ class Menu:
 
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     for boton in botones:
                         if boton["rect"].collidepoint(event.pos):
@@ -257,18 +313,22 @@ class Menu:
                                 self.mostrar_selector_microjuegos(screen)
                             elif boton["texto"] == "Salir":
                                 pygame.quit()
-                                exit()
+                                sys.exit()
             reloj.tick(60)
 
 
     def mostrar_selector_microjuegos(self, screen):
+            """
+            Muestra un selector de microjuegos con pestañas y animación de bamboleo en los títulos.
+            :param screen: pantalla donde se dibuja el menú
+            """
             import pygame
             from math import sin
             from core.gestor_sprites import GIFSprite
             from core.gestor_audio import Audio
+
             # Import dinámico de clases de juego
             from microgames.macro_pong4D import Pong4D
-            from microgames.microgame_codigo import MicrojuegoEscribirCodigo
             from microgames.microgame_diana import MicrojuegoDispararFlecha
             from microgames.microgame_hankujas import MicrojuegoExplotarBurbujas
             from microgames.microgame_snake import SnakeGame
@@ -279,25 +339,23 @@ class Menu:
             categorias = [
                 {"nombre": "Microjuegos", "lista": [
                     {"nombre": "Explota", "clase": MicrojuegoExplotarBurbujas,
-                     "imagen": "../assets/thumbnails/good_title.png"},
-                    {"nombre": "Código", "clase": MicrojuegoEscribirCodigo,
-                     "imagen": "../assets/thumbnails/hacking_title.jpg"},
+                     "imagen": ruta_recurso("assets/thumbnails/good_title.png")},
                     {"nombre": "Flecha", "clase": MicrojuegoDispararFlecha,
-                     "imagen": "../assets/thumbnails/arrow_title.png"},
+                     "imagen": ruta_recurso("assets/thumbnails/arrow_title.png")},
                     {"nombre": "Snake", "clase": SnakeGame,
-                     "imagen": "../assets/thumbnails/snake_title_2.png"},
+                     "imagen": ruta_recurso("assets/thumbnails/snake_title_2.png")},
                     {"nombre": "Tetris", "clase": Tetris,
-                     "imagen": "../assets/thumbnails/tetris_title.jpg"},
+                     "imagen": ruta_recurso("assets/thumbnails/tetris_title.jpg")},
                     {"nombre": "Pollovolador", "clase": MicrojuegoFlappyBird,
-                     "imagen": "../assets/thumbnails/flappy_title.jpg"},
+                     "imagen": ruta_recurso("assets/thumbnails/flappy_title.jpg")},
                 ]},
                 {"nombre": "Macrojuegos", "lista": [
-                    {"nombre": "Pong4D", "clase": Pong4D, "imagen": "../assets/thumbnails/pong4d_title.jpg"},
+                    {"nombre": "Pong4D", "clase": Pong4D, "imagen": ruta_recurso("assets/thumbnails/pong4d_title.jpg")},
                 ]},
                 {"nombre": "Juegos especiales", "lista": [
-                    {"nombre": "Snake clasico", "clase": SnakeGame, "imagen": "../assets/thumbnails/snake_title_2.png"},
-                    {"nombre": "Tetris clasico", "clase": Tetris, "imagen": "../assets/thumbnails/tetris_title.jpg"},
-                    {"nombre": "Flappy Bird infinito", "clase": MicrojuegoFlappyBird, "imagen": "../assets/thumbnails/flappy_title.jpg"},
+                    {"nombre": "Snake clasico", "clase": SnakeGame, "imagen": ruta_recurso("assets/thumbnails/snake_title_2.png")},
+                    {"nombre": "Tetris clasico", "clase": Tetris, "imagen": ruta_recurso("assets/thumbnails/tetris_title.jpg")},
+                    {"nombre": "Flappy Bird infinito", "clase": MicrojuegoFlappyBird, "imagen": ruta_recurso("assets/thumbnails/flappy_title.jpg")},
                 ]},
             ]
 
@@ -316,7 +374,7 @@ class Menu:
             title_font = pygame.font.Font(None, 64)
             spacing = 20
             reloj = pygame.time.Clock()
-            fondo_gif = GIFSprite("../assets/menu/menu.gif", screen.get_width(), screen.get_height())
+            fondo_gif = GIFSprite(ruta_recurso("assets/menu/menu.gif"), screen.get_width(), screen.get_height())
             control_audio = Audio()
 
             while True:
@@ -353,17 +411,18 @@ class Menu:
 
                 # Prepara factory individual para cada juego
                 for idx, mj in enumerate(juegos):
-                    if categorias[active_tab]["nombre"] == "Juegos especiales" and mj["nombre"] == "Snake clasico":
-                        orig = mj["clase"]
-                        mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
-                    if categorias[active_tab]["nombre"] == "Juegos especiales" and mj["nombre"] == "Tetris clasico":
-                        orig = mj["clase"]
-                        mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
-                    if categorias[active_tab]["nombre"] == "Juegos especiales" and mj["nombre"] == "Flappy Bird infinito":
-                        orig = mj["clase"]
-                        mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
-                    else:
-                        mj["factory"] = mj["clase"]
+                    mj["factory"] = mj["clase"]  # Por defecto
+
+                    if categorias[active_tab]["nombre"] == "Juegos especiales":
+                        if mj["nombre"] == "Snake clasico":
+                            orig = mj["clase"]
+                            mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
+                        elif mj["nombre"] == "Tetris clasico":
+                            orig = mj["clase"]
+                            mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
+                        elif mj["nombre"] == "Flappy Bird infinito":
+                            orig = mj["clase"]
+                            mj["factory"] = lambda scr, tm, df, o=orig: o(scr, tm, df, infinity=True)
 
                 # Renderiza cada juego
                 for idx, mj in enumerate(juegos):
@@ -392,8 +451,8 @@ class Menu:
                 # Eventos
                 for ev in pygame.event.get():
                     if ev.type == pygame.QUIT:
-                        pygame.quit();
-                        exit()
+                        pygame.quit()
+                        sys.exit()
                     if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
                         # Cambio de pestaña
                         for i, r in enumerate(tab_rects):
@@ -457,7 +516,7 @@ class Menu:
             for ev in pygame.event.get():
                 if ev.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    sys.exit()
                 elif ev.type == pygame.KEYDOWN and ev.key == pygame.K_ESCAPE:
                     # si aprieta ESC de nuevo, sale de pausa
                     return "continue"

@@ -1,7 +1,6 @@
 import pygame
 
 from microgames.microgame_hankujas import MicrojuegoExplotarBurbujas
-from microgames.microgame_codigo import MicrojuegoEscribirCodigo
 from microgames.microgame_diana import MicrojuegoDispararFlecha
 from microgames.microgame_snake import SnakeGame
 from microgames.macro_pong4D import Pong4D
@@ -9,26 +8,25 @@ from core.gestor_audio import Audio
 from microgames.microgame_tetris import Tetris
 from microgames.microgame_pollovolador import MicrojuegoFlappyBird
 
-
 class GameManager:
+    """Clase que gestiona los microjuegos y el macrojuego final."""
     def __init__(self, screen):
         self.screen = screen
-        self.minijuegos = [MicrojuegoFlappyBird, SnakeGame, MicrojuegoExplotarBurbujas, Tetris]  # Lista de clases de minijuegos
+        self.minijuegos = [Tetris, SnakeGame, MicrojuegoExplotarBurbujas, MicrojuegoDispararFlecha, MicrojuegoFlappyBird]  # Lista de clases de minijuegos
         self.indice = 0  # Lleva el progreso
         self.dificultad = 1
         self.macro_win = False
 
     def reiniciar(self):
+        """Reinicia el gestor de microjuegos a su estado inicial."""
         self.indice = 0
 
     def ejecutar_microjuego(self, time):
-        resultado = False
-
+        """Ejecuta el microjuego actual o el macrojuego final si se han completado todos los microjuegos."""
         if self.indice >= len(self.minijuegos) :
             self.epic_final_intro()
             macrojuego = Pong4D(self.screen, time, self.dificultad)
             self.macro_win = macrojuego.ejecutar()
-            print(self.macro_win)
 
         else:
             # Ejecutar el minijuego
@@ -43,16 +41,20 @@ class GameManager:
             return resultado or self.macro_win
 
     def isTerminado(self):
+        """Verifica si se han completado todos los microjuegos y se ha ganado el macrojuego."""
         return self.macro_win
 
     def subir_dificultad(self):
+        """Aumenta la dificultad del juego."""
         self.dificultad += 1
 
     def siguiente_vuelta(self):
+        """Activa la siguiente vuelta."""
         self.indice = 0
         self.subir_dificultad()
 
-    def simulate_crash_with_humor(self, screen):
+    def simular_crasheo(self, screen):
+        """Simula un fallo del programa con un mensaje humorístico."""
         import pygame
         import tkinter as tk
         from tkinter import messagebox
@@ -89,8 +91,7 @@ Hello from the pygame community. https://www.pygame.org/contribute.html
         messagebox.showinfo("Solución encontrada", "Fallo mio, me falto un punto y coma")
 
     def epic_final_intro(self):
-        import tkinter as tk
-        """Muestra una introducción épica para el minijuego final."""
+        """Muestra una introducción épica para el minijuego final >:]."""
         font = pygame.font.Font(None, 74)
         self.audio = Audio()
         self.music_file = "Preludio.mp3"
@@ -106,4 +107,4 @@ Hello from the pygame community. https://www.pygame.org/contribute.html
             pygame.time.wait(1500)  # Espera 1.5 segundo entre mensajes
 
         self.audio.detener()
-        self.simulate_crash_with_humor(self.screen)  # Simula un fallo del programa
+        self.simular_crasheo(self.screen)  # Simula un fallo del programa

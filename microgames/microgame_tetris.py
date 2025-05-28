@@ -2,8 +2,9 @@ import pygame
 import random
 from src.layout import draw_frame
 from microgames.microgame_base import MicrojuegoBase
+from core.config import Config
 
-# Super Rotation System (SRS) wall kick data
+# Super Rotation System (SRS)
 JLSTZ_KICKS = {
     (0, 1): [(0, 0), (-1, 0), (-1, 1), (0, -2), (-1, -2)],
     (1, 0): [(0, 0), (1, 0), (1, -1), (0, 2), (1, 2)],
@@ -40,11 +41,12 @@ COLORES = {
     'S': (0, 255, 0), 'Z': (255, 0, 0), 'L': (255, 165, 0), 'J': (0, 0, 255)
 }
 
-# Original NES gravity speeds in frames (60fps) per level 0-10+\N
+# Gravedad en frames basados en la nes
 GRAVITY_FRAMES = [48, 43, 38, 33, 28, 23, 18, 13, 8, 6] + [5] * 91
 
 
 class Tetris(MicrojuegoBase):
+    """Clase que representa el minijuego Tetris"""
     def __init__(self, screen, tiempo, dificultad=1, infinity=False):
         super().__init__(screen, 999 if infinity else 12, dificultad)
         self.musica = "T1.mp3"
@@ -66,30 +68,31 @@ class Tetris(MicrojuegoBase):
         self.pos = [0, 3]
         self.rot = 0
         self.last = pygame.time.get_ticks()
-        # level and line counters
+
         self.level = 0
         self.lines = 0
-        # timing
+
         self.delay = GRAVITY_FRAMES[self.level] * (1000 / 60)
         self.fast = False
         self.lock_delay = 500
         self.lock_time = None
-        # storage and score
+
         self.guarda = None
         self.can_store = True
         self.score = 0
 
-        # rotation flag
         self.last_rotate = False
         self._fill_bag()
         self._next()
 
     def _fill_bag(self):
+        """Inicializa el minijuego Tetris"""
         lst = list(FORMAS.keys())
         random.shuffle(lst)
         self.bolsa += lst
 
     def _next(self):
+        """Genera la siguiente pieza y la coloca en la posición inicial"""
         if not self.bolsa:
             self._fill_bag()
         if self.siguiente is None:
@@ -103,6 +106,7 @@ class Tetris(MicrojuegoBase):
         self.last_rotate = False
 
     def _can_place(self, shape, off, rot):
+        """Verifica si se puede colocar la pieza en la posición y rotación dadas"""
         for i, row in enumerate(shape):
             for j, val in enumerate(row):
                 if val:
@@ -113,6 +117,7 @@ class Tetris(MicrojuegoBase):
         return True
 
     def _rotate(self, dir):
+        """Rota la pieza en la dirección indicada, aplicando las reglas de SRS"""
         old = self.rot
         new = (self.rot + dir) % len(FORMAS[self.actual])
         kicks = I_KICKS if self.actual == 'I' else JLSTZ_KICKS
@@ -126,6 +131,7 @@ class Tetris(MicrojuegoBase):
                 break
 
     def manejar_eventos(self, event):
+        """Maneja los eventos del teclado y actualiza la posición de la pieza"""
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and self._can_place(FORMAS[self.actual][self.rot], (0, -1), self.rot):
             self.pos[1] -= 1
@@ -148,16 +154,15 @@ class Tetris(MicrojuegoBase):
             elif event.key == pygame.K_ESCAPE:
                 accion = self.menu.mostrar_pausa(self.screen)
                 if accion == "continue":
-                    # simplemente salimos del menú de pausa
                     pass
                 elif accion == "options":
                     self.menu.mostrar_opciones(self.screen)
-                    # al cerrar opciones volverá aquí y saldrá de pausa
                 elif accion == "exit":
-                    # retornamos una señal para que el bucle superior maneje la salida
                     return "exit_to_menu"
 
+
     def _store(self):
+        """Guarda la pieza actual en la reserva y coloca la siguiente pieza"""
         self.actual, self.guarda = self.guarda, self.actual
         if not self.actual:
             self._next()
@@ -168,7 +173,7 @@ class Tetris(MicrojuegoBase):
         self.last_rotate = False
 
     def actualizar(self):
-        # update level speed
+        """Actualiza la lógica del minijuego Tetris"""
         self.delay = GRAVITY_FRAMES[min(self.level, len(GRAVITY_FRAMES) - 1)] * (1000 / 60)
         now = pygame.time.get_ticks()
         spd = 50 if self.fast else self.delay
@@ -189,18 +194,20 @@ class Tetris(MicrojuegoBase):
                 self.lock_time = None
 
     def _lock(self):
+        """Fija la pieza actual en la cuadrícula y limpia líneas si es necesario"""
         # place piece
         for i, row in enumerate(FORMAS[self.actual][self.rot]):
             for j, val in enumerate(row):
                 if val:
                     self.grid[self.pos[0] + i][self.pos[1] + j] = self.actual
-        # clear lines and count
+
         new = [r for r in self.grid if not all(r)]
         cnt = self.filas - len(new)
         for _ in range(cnt):
             new.insert(0, [0] * self.columnas)
         self.grid = new
-        # update lines and level
+
+        # Control de nivel y líneas
         self.lines += cnt
 
         if not self.infinity:
@@ -208,21 +215,31 @@ class Tetris(MicrojuegoBase):
                 self.win = True
 
         if cnt > 0:
-            self.level = self.lines // 4
+            self.level = self.lines // 5
             if self.level == 8:
                 self.audio.detener()
                 self.musica = "T2.mp3"
                 self.audio.reproducir(self.musica)
-        # scoring
+
         self.score += 100 * cnt + (50 * cnt if cnt > 1 else 0)
         self._next()
 
     def _hard_drop(self):
+        """Deja caer la pieza actual hasta el fondo de la cuadrícula"""
         while self._can_place(FORMAS[self.actual][self.rot], (1, 0), self.rot):
             self.pos[0] += 1
         self._lock()
 
+    def _posicion_sombra(self):
+        """Devuelve la posición más baja posible de la pieza actual (ghost piece)."""
+        pos_ghost = list(self.pos)
+        while self._can_place(FORMAS[self.actual][self.rot],
+                              (pos_ghost[0] + 1 - self.pos[0], pos_ghost[1] - self.pos[1]), self.rot):
+            pos_ghost[0] += 1
+        return pos_ghost
+
     def dibujar(self):
+        """Dibuja el minijuego Tetris en la pantalla"""
         super().dibujar()
         draw_frame(self.screen)
         pygame.draw.rect(
@@ -231,7 +248,8 @@ class Tetris(MicrojuegoBase):
              self.columnas * self.ancho_bloque + 4,
              self.filas * self.ancho_bloque + 4), 2
         )
-        # display score, lines, level
+
+        # Mostrar puntuación, líneas y nivel
         font = pygame.font.SysFont(None, 24)
         txt_score = font.render(f"Puntos: {self.score}", True, (255, 255, 255))
         txt_lines = font.render(f"Lineas: {self.lines}", True, (255, 255, 255))
@@ -245,7 +263,7 @@ class Tetris(MicrojuegoBase):
             txt_objetivo = font.render(f"¡Haz {self.dificultad} lineas!", True, (255, 255, 255))
             self.screen.blit(txt_objetivo, (int(self.ancho // 2 * 0.89), 340))
 
-        # draw grid and pieces
+        # Dibujar la cuadrícula y piezas
         for i in range(self.filas):
             for j in range(self.columnas):
                 p = self.grid[i][j]
@@ -256,7 +274,20 @@ class Tetris(MicrojuegoBase):
                          self.margen_y + i * self.ancho_bloque,
                          self.ancho_bloque, self.ancho_bloque)
                     )
-        # current piece
+
+        # Sombra de la pieza (ghost piece)
+        pos_ghost = self._posicion_sombra()
+        for i, row in enumerate(FORMAS[self.actual][self.rot]):
+            for j, val in enumerate(row):
+                if val:
+                    pygame.draw.rect(
+                        self.screen, (200, 200, 200, 100),  # Color gris claro
+                        (self.margen_x + (pos_ghost[1] + j) * self.ancho_bloque,
+                         self.margen_y + (pos_ghost[0] + i) * self.ancho_bloque,
+                         self.ancho_bloque, self.ancho_bloque)
+                    )
+        
+        # Pieza actual
         for i, row in enumerate(FORMAS[self.actual][self.rot]):
             for j, val in enumerate(row):
                 if val:
@@ -266,7 +297,8 @@ class Tetris(MicrojuegoBase):
                          self.margen_y + (self.pos[0] + i) * self.ancho_bloque,
                          self.ancho_bloque, self.ancho_bloque)
                     )
-        # stored piece
+
+        # Pieza guardada
         if self.guarda:
             tx = pygame.font.SysFont(None, 24).render("Guardado", True, (255, 255, 255))
             self.screen.blit(tx, (40, 40))
@@ -279,7 +311,8 @@ class Tetris(MicrojuegoBase):
                              60 + i * self.ancho_bloque,
                              self.ancho_bloque, self.ancho_bloque)
                         )
-        # next piece
+
+        # Siguiente pieza
         if self.siguiente:
             tx = pygame.font.SysFont(None, 24).render("Siguiente", True, (255, 255, 255))
             self.screen.blit(tx, (80, 150))
@@ -296,6 +329,9 @@ class Tetris(MicrojuegoBase):
     def ejecutar(self):
         """Ejecuta el bucle del minijuego y devuelve si ganó o perdió"""
         self.audio.reproducir(self.musica)
+        if Config.mostrar_ayuda:
+            self.mostrar_controles(self.screen, "\nRotar piezas FlechaArriba/Z\nFlechas - Mover pieza\nEspacio - Caída rápida de la pieza\nShift izquierdo - Guardar pieza actual")
+
         reloj = pygame.time.Clock()
         inicio = pygame.time.get_ticks()
 
@@ -319,9 +355,8 @@ class Tetris(MicrojuegoBase):
                 self.screen.blit(txt_score, (int(self.ancho // 2 * 0.85), 280))
             pygame.display.flip()
 
-            # Verifica si se acabó el tiempo
             if (pygame.time.get_ticks() - inicio) / 1000 > self.tiempo_limite:
                 self.audio.detener()
-                return self.win  # Minijuego perdido
+                return self.win
 
             reloj.tick(30)

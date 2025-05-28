@@ -99,3 +99,15 @@
 - ### **Arreglado**
   - Se puede poner en pausa todos los juegos sin que haya fallos
   - Pong4D ya se puede cerrar correctamente
+
+## [1.0.0] :  08 - 05 - 2025
+- ### **Añadido**:
+  - Se ha añadido el microjuego "polloVolador" con sus sprites y musica
+  - Se ha añadido una opcion "Ayuda" en el menu de opciones
+  - Se ha añadido el menu de ayuda en todos los minijuegos
+  - Se ha añadido nuevas imagenes en los créditos
+
+- ### **Arreglado**
+  - Se ha arreglado el problema del bloque amaraillo en el Tetris
+  - Se ha arreglado el fallo con los modos Infinity
+

@@ -13,6 +13,8 @@
 │   ├── 🎵 gestor_audio.py  <-- Maneja la música
 │   ├── 🎨 gestor_sprites.py <-- Carga sprites
 │   ├── 🖥️ gestor_menus.py  <-- Maneja los menus
+│   ├── ⚙️ utils.py  <-- Utilidades generales
+│   ├── ⚙️ config.py  <-- Configuraciones del juego
 │
 │── 📂 docs
 │   ├── 📜 TAREAS.md
@@ -26,7 +28,7 @@
 │
 │── 📂 src
 │   ├── 🎮 ateroWare.py             # Archivo principal del juego
-│   ├── ⚙️ global_configs.py        # Configuraciones globales
+│   ├──  global_configs.py        # Configuraciones globales
 │   ├── 🎨 layout.py                # Gestión de diseño de la UI
 │
 │── 📂 tests
